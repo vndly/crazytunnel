@@ -10,6 +10,7 @@ import com.mauriciotogneri.crazytunnel.activities.BaseFragment;
 import com.mauriciotogneri.crazytunnel.connection.MessageReader;
 import com.mauriciotogneri.crazytunnel.connection.Messages;
 import com.mauriciotogneri.crazytunnel.connection.Messages.SetPlayerColor;
+import com.mauriciotogneri.crazytunnel.connection.Messages.SetRegisteredPlayers;
 import com.mauriciotogneri.crazytunnel.objects.Player;
 
 public class LobbyClientScreen extends BaseFragment implements ClientEvent
@@ -36,6 +37,8 @@ public class LobbyClientScreen extends BaseFragment implements ClientEvent
 		
 		this.player = new Player(null);
 		this.player.name = playerName;
+		
+		showToast("TRYING TO CONNECT TO SERVER: " + serverDevice.getName() + " - " + serverDevice.getAddress());
 	}
 	
 	private void send(byte[] message)
@@ -68,6 +71,10 @@ public class LobbyClientScreen extends BaseFragment implements ClientEvent
 				case Messages.SetPlayerColor.CODE:
 					processSetPlayerColor(new SetPlayerColor(reader));
 					break;
+				
+				case Messages.SetRegisteredPlayers.CODE:
+					processSetRegisteredPlayers(new SetRegisteredPlayers(reader));
+					break;
 			}
 		}
 	}
@@ -79,14 +86,26 @@ public class LobbyClientScreen extends BaseFragment implements ClientEvent
 		send(Messages.SetPlayerName.create(this.player.name, this.player.color));
 	}
 	
-	private void addPlayerToList(Player player)
+	private void processSetRegisteredPlayers(final SetRegisteredPlayers setRegisteredPlayers)
 	{
-		this.playerAdapter.add(player);
+		runOnUiThread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				refreshPlayerList(setRegisteredPlayers.players);
+			}
+		});
 	}
 	
-	private void removePlayerFromList(Player player)
+	private void refreshPlayerList(Player[] players)
 	{
-		this.playerAdapter.remove(player);
+		this.playerAdapter.clear();
+		
+		for (Player player : players)
+		{
+			this.playerAdapter.add(player);
+		}
 	}
 	
 	@Override

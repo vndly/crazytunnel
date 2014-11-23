@@ -40,6 +40,8 @@ public class ServerSelectionScreen extends BaseFragment implements DeviceScanner
 		
 		this.scannerManager = new ScannerManager(getContext(), this);
 		this.scannerManager.scan();
+		
+		showToast("SARCHING SERVERS. PLAYER: " + this.playerName);
 	}
 	
 	private void serverSelected(BluetoothDevice device)
