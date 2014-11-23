@@ -25,6 +25,7 @@ import com.mauriciotogneri.crazytunnel.objects.Player;
 
 public class LobbyServerScreen extends BaseFragment implements ServerEvent
 {
+	private Player player;
 	private ServerConnection serverConnection;
 	private PlayerAdapter playerAdapter;
 	
@@ -87,8 +88,9 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 		if (acquireColor(freeColor))
 		{
 			String playerName = getParameter(LobbyServerScreen.PARAMETER_PLAYER_NAME);
-			Player player = new Player(this.serverConnection.getDeviceAddress(), playerName, freeColor);
-			this.registeredPlayers.put(this.serverConnection.getDeviceAddress(), player);
+			this.player = new Player(this.serverConnection.getDeviceAddress(), playerName, freeColor);
+			this.registeredPlayers.put(this.serverConnection.getDeviceAddress(), this.player);
+			this.playerAdapter.add(this.player);
 		}
 	}
 	
@@ -102,16 +104,10 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 		}
 	}
 	
-	private void disconnect()
-	{
-		this.serverConnection.close();
-		finish();
-	}
-	
 	@Override
 	protected void onClose()
 	{
-		disconnect();
+		this.serverConnection.close();
 	}
 	
 	@Override

@@ -34,6 +34,7 @@ public class PlayerAdapter extends ArrayAdapter<Player>
 		
 		TextView name = (TextView)convertView.findViewById(R.id.player_name);
 		name.setText(player.name);
+		name.setTextColor(player.color);
 		
 		return convertView;
 	}

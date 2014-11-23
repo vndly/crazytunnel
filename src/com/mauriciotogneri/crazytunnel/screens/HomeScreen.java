@@ -1,5 +1,7 @@
 package com.mauriciotogneri.crazytunnel.screens;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -39,6 +41,9 @@ public class HomeScreen extends BaseFragment
 				joinMatch();
 			}
 		});
+		
+		EditText playerName = findViewById(R.id.player_name);
+		playerName.setText(new BigInteger(10, new SecureRandom()).toString(4));
 	}
 	
 	private void createMatch()
