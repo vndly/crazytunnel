@@ -37,8 +37,6 @@ public class LobbyClientScreen extends BaseFragment implements ClientEvent
 		
 		this.player = new Player(null);
 		this.player.name = playerName;
-		
-		showToast("TRYING TO CONNECT TO SERVER: " + serverDevice.getName() + " - " + serverDevice.getAddress());
 	}
 	
 	private void send(byte[] message)
