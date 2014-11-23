@@ -104,6 +104,8 @@ public class Game implements GameEvent
 	
 	public void update(float delta, InputEvent input, Renderer renderer)
 	{
+		this.alarmCountdown.step(delta);
+		
 		switch (this.gameStatus)
 		{
 			case RUNNING:
