@@ -37,6 +37,9 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 	private final Object colorLock = new Object();
 	private final SparseBooleanArray colorIndex = new SparseBooleanArray();
 	
+	public static final String PARAMETER_PLAYER_NAME = "player_name";
+	public static final String PARAMETER_NUMBER_OF_PLAYERS = "number_of_players";
+	
 	@Override
 	protected void onInitialize()
 	{
@@ -71,18 +74,32 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 			}
 		});
 		
+		int numberOfPlayers = getParameter(LobbyServerScreen.PARAMETER_NUMBER_OF_PLAYERS);
+		
 		this.serverConnection = new ServerConnection(this, getContext());
-		this.serverConnection.listen(LobbyServerScreen.UUID, 2, LobbyServerScreen.VISIBILITY_DURATION);
+		this.serverConnection.listen(LobbyServerScreen.UUID, numberOfPlayers, LobbyServerScreen.VISIBILITY_DURATION);
 		
 		TextView deviceAddress = (TextView)findViewById(R.id.device_address);
 		deviceAddress.setText(this.serverConnection.getDeviceName() + "\r\n" + this.serverConnection.getDeviceAddress());
+		
+		int freeColor = getFreeColor();
+		
+		if (acquireColor(freeColor))
+		{
+			String playerName = getParameter(LobbyServerScreen.PARAMETER_PLAYER_NAME);
+			Player player = new Player(this.serverConnection.getDeviceAddress(), playerName, freeColor);
+			this.registeredPlayers.put(this.serverConnection.getDeviceAddress(), player);
+		}
 	}
 	
 	private void send(Player player, byte[] message)
 	{
 		BluetoothDevice device = this.playerDevices.get(player);
 		
-		this.serverConnection.send(device, message);
+		if (device != null)
+		{
+			this.serverConnection.send(device, message);
+		}
 	}
 	
 	private void disconnect()
@@ -216,6 +233,7 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 		{
 			Player player = new Player(macAddress);
 			this.registeredPlayers.put(macAddress, player);
+			this.playerDevices.put(player, device);
 			
 			int freeColor = getFreeColor();
 			send(player, Messages.SetPlayerColor.create(freeColor));

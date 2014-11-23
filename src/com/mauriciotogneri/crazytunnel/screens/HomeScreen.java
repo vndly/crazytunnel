@@ -7,6 +7,7 @@ import android.widget.EditText;
 import android.widget.NumberPicker;
 import com.mauriciotogneri.crazytunnel.R;
 import com.mauriciotogneri.crazytunnel.activities.BaseFragment;
+import com.mauriciotogneri.crazytunnel.screens.lobby.LobbyServerScreen;
 import com.mauriciotogneri.crazytunnel.screens.lobby.ServerSelectionScreen;
 
 public class HomeScreen extends BaseFragment
@@ -44,6 +45,11 @@ public class HomeScreen extends BaseFragment
 	{
 		String playerName = getPlayerName();
 		int numberOfPlayers = getNumberOfPlayers();
+		
+		LobbyServerScreen lobbyServer = new LobbyServerScreen();
+		lobbyServer.setParameter(LobbyServerScreen.PARAMETER_PLAYER_NAME, playerName);
+		lobbyServer.setParameter(LobbyServerScreen.PARAMETER_NUMBER_OF_PLAYERS, numberOfPlayers);
+		openFragment(lobbyServer);
 	}
 	
 	private void joinMatch()
