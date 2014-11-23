@@ -1,5 +1,6 @@
 package com.mauriciotogneri.crazytunnel.engine;
 
+import java.util.List;
 import android.graphics.Color;
 import android.os.Vibrator;
 import com.mauriciotogneri.crazytunnel.connection.MessageReader;
@@ -8,6 +9,7 @@ import com.mauriciotogneri.crazytunnel.engine.Alarm.OnAlarmRing;
 import com.mauriciotogneri.crazytunnel.input.InputEvent;
 import com.mauriciotogneri.crazytunnel.objects.Level;
 import com.mauriciotogneri.crazytunnel.objects.LevelDefinition;
+import com.mauriciotogneri.crazytunnel.objects.Player;
 import com.mauriciotogneri.crazytunnel.objects.PlayerBox;
 import com.mauriciotogneri.crazytunnel.screens.game.GameConnection;
 import com.mauriciotogneri.crazytunnel.screens.game.GameEvent;
@@ -21,6 +23,9 @@ public class Game implements GameEvent
 	private final GameConnection gameConnection;
 	private final boolean isServer;
 	private Renderer renderer;
+	
+	private final Player player;
+	private final List<Player> enemyPlayers;
 	
 	private final Camera camera;
 	
@@ -38,10 +43,14 @@ public class Game implements GameEvent
 		RUNNING; // the race is on
 	}
 	
-	public Game(GameScreen gameScreen, GameConnection gameConnection, boolean isServer)
+	public Game(GameScreen gameScreen, GameConnection gameConnection, Player player, List<Player> enemyPlayers, boolean isServer)
 	{
 		this.gameScreen = gameScreen;
 		this.gameConnection = gameConnection;
+		
+		this.player = player;
+		this.enemyPlayers = enemyPlayers;
+		
 		this.isServer = isServer;
 		this.camera = new Camera(Renderer.RESOLUTION_X, Renderer.RESOLUTION_Y);
 		
@@ -67,7 +76,7 @@ public class Game implements GameEvent
 			LevelDefinition levelDefinition = getLevelDefinition();
 			
 			this.level = new Level(this.camera, levelDefinition);
-			this.playerBox = new PlayerBox(this.camera, this.level, vibrator, 0, Renderer.RESOLUTION_Y / 2);
+			this.playerBox = new PlayerBox(this.camera, this.level, vibrator, 0, Renderer.RESOLUTION_Y / 2, this.player.color);
 			
 			restart();
 		}
@@ -110,10 +119,6 @@ public class Game implements GameEvent
 		{
 			case RUNNING:
 				this.playerBox.update(delta, input);
-				
-				renderer.clearScreen(this.camera);
-				this.level.render(renderer);
-				this.playerBox.render(renderer);
 				break;
 			case COUNTDOWN:
 				break;
@@ -125,6 +130,10 @@ public class Game implements GameEvent
 				}
 				break;
 		}
+		
+		renderer.clearScreen(this.camera);
+		this.level.render(renderer);
+		this.playerBox.render(renderer);
 	}
 	
 	private void countdownFinished()

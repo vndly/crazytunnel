@@ -38,6 +38,18 @@ public class GameConnection implements ClientEvent, ServerEvent
 		}
 	}
 	
+	public String getMacAddress()
+	{
+		if (isClient())
+		{
+			return this.clientConnection.getDeviceAddress();
+		}
+		else
+		{
+			return this.serverConnection.getDeviceAddress();
+		}
+	}
+	
 	public boolean isClient()
 	{
 		return this.clientConnection != null;

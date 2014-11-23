@@ -1,6 +1,5 @@
 package com.mauriciotogneri.crazytunnel.objects;
 
-import android.graphics.Color;
 import android.os.Vibrator;
 import com.mauriciotogneri.crazytunnel.engine.Camera;
 import com.mauriciotogneri.crazytunnel.engine.Renderer;
@@ -30,13 +29,13 @@ public class PlayerBox
 	
 	private static final int SIZE = 5;
 	
-	public PlayerBox(Camera camera, Level level, Vibrator vibrator, float x, float y)
+	public PlayerBox(Camera camera, Level level, Vibrator vibrator, float x, float y, int color)
 	{
 		this.camera = camera;
 		this.level = level;
 		this.vibrator = vibrator;
 		
-		Shape square = new Square(PlayerBox.SIZE, Color.RED);
+		Shape square = new Square(PlayerBox.SIZE, color);
 		this.sprite = new Sprite(square, x, y);
 	}
 	
