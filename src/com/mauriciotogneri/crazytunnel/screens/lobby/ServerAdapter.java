@@ -32,7 +32,7 @@ public class ServerAdapter extends ArrayAdapter<BluetoothDevice>
 			convertView = this.inflater.inflate(R.layout.row_server, parent, false);
 		}
 		
-		TextView name = (TextView)convertView.findViewById(R.id.player_name);
+		TextView name = (TextView)convertView.findViewById(R.id.server_name);
 		name.setText(device.getName() + " - " + device.getAddress());
 		
 		return convertView;
