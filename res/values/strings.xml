@@ -5,5 +5,7 @@
     
     <string name="home_create_game">Create game</string>
     <string name="home_join_game">Join game</string>
+    
+    <string name="lobby_start_game">Start game</string>
 
 </resources>

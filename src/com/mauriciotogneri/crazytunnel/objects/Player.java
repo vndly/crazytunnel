@@ -1,14 +1,15 @@
 package com.mauriciotogneri.crazytunnel.objects;
 
+import android.bluetooth.BluetoothDevice;
+
 public class Player
 {
-	public String macAddress;
-	public String name;
+	public final BluetoothDevice device;
+	public String name = "";
 	public int color = 0;
 	
-	public Player(String macAddress, String name)
+	public Player(BluetoothDevice device)
 	{
-		this.macAddress = macAddress;
-		this.name = name;
+		this.device = device;
 	}
 }
