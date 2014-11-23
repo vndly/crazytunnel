@@ -138,5 +138,7 @@ public class LobbyClientScreen extends BaseFragment implements ClientEvent
 	public void onDisconnect()
 	{
 		showToast("Disconnected...");
+		this.clientConnection.close();
+		finish();
 	}
 }
