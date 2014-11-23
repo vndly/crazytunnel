@@ -1,19 +1,19 @@
 package com.mauriciotogneri.crazytunnel.screens.game;
 
 import java.util.List;
-import android.opengl.GLSurfaceView;
 import com.mauriciotogneri.crazytunnel.R;
 import com.mauriciotogneri.crazytunnel.activities.BaseFragment;
+import com.mauriciotogneri.crazytunnel.engine.CustomSurfaceView;
 import com.mauriciotogneri.crazytunnel.engine.Game;
+import com.mauriciotogneri.crazytunnel.engine.Renderer;
 import com.mauriciotogneri.crazytunnel.objects.Player;
-import com.mauriciotogneri.crazytunnel.screens.game.GameConnection.GameEvent;
 
-public class GameScreen extends BaseFragment implements GameEvent
+public class GameScreen extends BaseFragment
 {
 	private Game game;
 	private GameConnection gameConnection;
 	private List<Player> players;
-	private GLSurfaceView screen;
+	private CustomSurfaceView screen;
 	
 	public static final String PARAMETER_GAME_CONNECTION = "game_connection";
 	public static final String PARAMETER_PLAYERS = "players";
@@ -22,14 +22,14 @@ public class GameScreen extends BaseFragment implements GameEvent
 	protected void onInitialize()
 	{
 		this.gameConnection = getParameter(GameScreen.PARAMETER_GAME_CONNECTION);
-		this.gameConnection.setListener(this);
 		
 		this.players = getParameter(GameScreen.PARAMETER_PLAYERS);
 		
-		// this.game = new Game(this);
+		this.game = new Game(this);
+		this.gameConnection.setListener(this.game);
 		
-		// CustomSurfaceView surfaceView = findViewById(R.id.glSurface);
-		// surfaceView.setRenderer(new Renderer(this.game, this, this.screen));
+		this.screen = findViewById(R.id.glSurface);
+		this.screen.setRenderer(new Renderer(this.game, getContext(), this.screen));
 	}
 	
 	@Override

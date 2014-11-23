@@ -1,19 +1,19 @@
 package com.mauriciotogneri.crazytunnel.engine;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.os.Vibrator;
-import com.mauriciotogneri.crazytunnel.activities.MainActivity;
 import com.mauriciotogneri.crazytunnel.input.InputEvent;
 import com.mauriciotogneri.crazytunnel.objects.Level;
 import com.mauriciotogneri.crazytunnel.objects.LevelDefinition;
 import com.mauriciotogneri.crazytunnel.objects.PlayerBox;
+import com.mauriciotogneri.crazytunnel.screens.game.GameConnection.GameEvent;
+import com.mauriciotogneri.crazytunnel.screens.game.GameScreen;
 import com.mauriciotogneri.crazytunnel.shapes.Rectangle;
 import com.mauriciotogneri.crazytunnel.shapes.Shape;
 
-public class Game
+public class Game implements GameEvent
 {
-	private final MainActivity mainActivity;
+	private final GameScreen gameScreen;
 	private Renderer renderer;
 	
 	private final Camera camera;
@@ -21,10 +21,10 @@ public class Game
 	private PlayerBox playerBox;
 	private Level level;
 	
-	public Game(MainActivity mainActivity)
+	public Game(GameScreen gameScreen)
 	{
+		this.gameScreen = gameScreen;
 		this.camera = new Camera(Renderer.RESOLUTION_X, Renderer.RESOLUTION_Y);
-		this.mainActivity = mainActivity;
 	}
 	
 	public void start(Renderer renderer)
@@ -33,7 +33,7 @@ public class Game
 		{
 			this.renderer = renderer;
 			
-			Vibrator vibrator = (Vibrator)this.mainActivity.getSystemService(Context.VIBRATOR_SERVICE);
+			Vibrator vibrator = this.gameScreen.getVibrator();
 			LevelDefinition levelDefinition = getLevelDefinition();
 			
 			this.level = new Level(this.camera, levelDefinition);

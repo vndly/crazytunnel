@@ -5,6 +5,7 @@ import java.util.Map;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,6 +48,11 @@ public abstract class BaseFragment extends Fragment
 	
 	protected void onClose()
 	{
+	}
+	
+	public Vibrator getVibrator()
+	{
+		return this.baseActivity.getVibrator();
 	}
 	
 	public void setParameter(String key, Object value)

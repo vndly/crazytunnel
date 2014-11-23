@@ -1,7 +1,9 @@
 package com.mauriciotogneri.crazytunnel.activities;
 
 import java.util.Stack;
+import android.content.Context;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.view.Window;
@@ -51,6 +53,11 @@ public abstract class BaseActivity extends FragmentActivity
 	
 	protected void onClose()
 	{
+	}
+	
+	public Vibrator getVibrator()
+	{
+		return (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
 	}
 	
 	protected void openFragment(BaseFragment fragment)

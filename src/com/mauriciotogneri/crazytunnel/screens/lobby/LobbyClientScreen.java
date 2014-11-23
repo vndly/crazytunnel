@@ -132,6 +132,8 @@ public class LobbyClientScreen extends BaseFragment implements ClientEvent
 	public void onErrorConnecting()
 	{
 		showToast("Error connecting...");
+		this.clientConnection.close();
+		close();
 	}
 	
 	@Override
@@ -139,6 +141,6 @@ public class LobbyClientScreen extends BaseFragment implements ClientEvent
 	{
 		showToast("Disconnected...");
 		this.clientConnection.close();
-		finish();
+		close();
 	}
 }
