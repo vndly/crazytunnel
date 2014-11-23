@@ -86,21 +86,4 @@ public class Messages
 			return writer.getMessage();
 		}
 	}
-	
-	// public static class ConfirmPlayerRegistration
-	// {
-	// public static final byte CODE = 3;
-	//
-	// public ConfirmPlayerRegistration()
-	// {
-	// }
-	//
-	// public static byte[] create()
-	// {
-	// MessageWriter writer = new MessageWriter();
-	// writer.putByte(ConfirmPlayerRegistration.CODE);
-	//
-	// return writer.getMessage();
-	// }
-	// }
 }

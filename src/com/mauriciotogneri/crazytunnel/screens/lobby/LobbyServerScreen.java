@@ -149,9 +149,6 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 					}
 				});
 				
-				// TODO: SEND CONFIRMATION?
-				// send(player, Messages.ConfirmPlayerRegistration.create());
-				
 				broadcastListOfPlayers();
 			}
 		}
@@ -248,6 +245,7 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 			}
 			
 			this.registeredPlayers.remove(macAddress);
+			broadcastListOfPlayers();
 			
 			runOnUiThread(new Runnable()
 			{
