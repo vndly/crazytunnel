@@ -1,5 +1,6 @@
 package com.mauriciotogneri.crazytunnel.engine;
 
+import java.util.ArrayList;
 import java.util.List;
 import android.graphics.Color;
 import android.os.Vibrator;
@@ -7,6 +8,7 @@ import com.mauriciotogneri.crazytunnel.connection.MessageReader;
 import com.mauriciotogneri.crazytunnel.connection.Messages;
 import com.mauriciotogneri.crazytunnel.engine.Alarm.OnAlarmRing;
 import com.mauriciotogneri.crazytunnel.input.InputEvent;
+import com.mauriciotogneri.crazytunnel.objects.EnemyBox;
 import com.mauriciotogneri.crazytunnel.objects.Level;
 import com.mauriciotogneri.crazytunnel.objects.LevelDefinition;
 import com.mauriciotogneri.crazytunnel.objects.Player;
@@ -30,6 +32,8 @@ public class Game implements GameEvent
 	private final Camera camera;
 	
 	private PlayerBox playerBox;
+	private final List<EnemyBox> enemyBox = new ArrayList<EnemyBox>();
+	
 	private Level level;
 	
 	private final Alarm alarmCountdown;
