@@ -73,7 +73,7 @@ public class Messages
 		public static byte[] create(List<Player> players)
 		{
 			MessageWriter writer = new MessageWriter();
-			writer.putByte(SetPlayerName.CODE);
+			writer.putByte(SetRegisteredPlayers.CODE);
 			writer.putInt(players.size());
 			
 			for (Player player : players)

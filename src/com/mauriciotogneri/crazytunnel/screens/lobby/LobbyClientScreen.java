@@ -46,16 +46,10 @@ public class LobbyClientScreen extends BaseFragment implements ClientEvent
 		this.clientConnection.send(message);
 	}
 	
-	private void disconnect()
-	{
-		this.clientConnection.close();
-		finish();
-	}
-	
 	@Override
 	protected void onClose()
 	{
-		disconnect();
+		this.clientConnection.close();
 	}
 	
 	@Override

@@ -159,8 +159,6 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 	
 	private void broadcastListOfPlayers()
 	{
-		// TODO: SEND ALL PLAYERS THE CURRENT REGISTRED PLAYERS
-		
 		List<Player> list = new ArrayList<Player>();
 		
 		for (Player player : this.registeredPlayers.values())
