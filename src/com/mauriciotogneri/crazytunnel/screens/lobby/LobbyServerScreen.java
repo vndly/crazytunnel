@@ -2,6 +2,7 @@ package com.mauriciotogneri.crazytunnel.screens.lobby;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import android.bluetooth.BluetoothDevice;
 import android.graphics.Color;
@@ -28,9 +29,10 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 	private PlayerAdapter playerAdapter;
 	
 	private static final int VISIBILITY_DURATION = 60;
-	public static final String UUID = "a6989332-69a6-11e4-b116-123b93f75cba";
+	public static final String UUID = "e6c3c895-1dcf-4a8d-9e75-9c57c9123cb9";
 	
 	private final Map<String, Player> registeredPlayers = new HashMap<String, Player>();
+	private final Map<Player, BluetoothDevice> playerDevices = new HashMap<Player, BluetoothDevice>();
 	
 	private final Object colorLock = new Object();
 	private final SparseBooleanArray colorIndex = new SparseBooleanArray();
@@ -78,7 +80,9 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 	
 	private void send(Player player, byte[] message)
 	{
-		this.serverConnection.send(player.device, message);
+		BluetoothDevice device = this.playerDevices.get(player);
+		
+		this.serverConnection.send(device, message);
 	}
 	
 	private void disconnect()
@@ -103,10 +107,6 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 			
 			switch (code)
 			{
-				case Messages.SetFreeColor.CODE:
-					// TODO: ONLY IN CLIENT
-					break;
-				
 				case Messages.SetPlayerName.CODE:
 					processSetPlayerName(device, new SetPlayerName(reader));
 					break;
@@ -116,9 +116,11 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 	
 	private void processSetPlayerName(BluetoothDevice device, SetPlayerName setPlayerName)
 	{
-		if (!this.registeredPlayers.containsKey(device.getAddress()))
+		String macAddress = device.getAddress();
+		
+		if (this.registeredPlayers.containsKey(macAddress))
 		{
-			final Player player = new Player(device);
+			final Player player = this.registeredPlayers.get(macAddress);
 			
 			if (acquireColor(setPlayerName.color))
 			{
@@ -133,11 +135,32 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 						addPlayerToList(player);
 					}
 				});
+				
+				// TODO: SEND CONFIRMATION?
+				// send(player, Messages.ConfirmPlayerRegistration.create());
+				
+				broadcastListOfPlayers();
 			}
-			
-			// SEND CONFIRMATION
-			// send(player, Messages.SetFreeColor.create(freeColor));
 		}
+	}
+	
+	private void broadcastListOfPlayers()
+	{
+		// TODO: SEND ALL PLAYERS THE CURRENT REGISTRED PLAYERS
+		
+		List<Player> list = new ArrayList<Player>();
+		
+		for (Player player : this.registeredPlayers.values())
+		{
+			if (player.isValid())
+			{
+				list.add(player);
+			}
+		}
+		
+		this.serverConnection.sendAll(Messages.SetRegisteredPlayers.create(list));
+		
+		showToast("SENDING BROADCAST OF REGISTERED PLAYERS");
 	}
 	
 	private int getFreeColor()
@@ -191,11 +214,11 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 		
 		if (!this.registeredPlayers.containsKey(macAddress))
 		{
-			Player player = new Player(device);
+			Player player = new Player(macAddress);
 			this.registeredPlayers.put(macAddress, player);
 			
 			int freeColor = getFreeColor();
-			send(player, Messages.SetFreeColor.create(freeColor));
+			send(player, Messages.SetPlayerColor.create(freeColor));
 		}
 	}
 	

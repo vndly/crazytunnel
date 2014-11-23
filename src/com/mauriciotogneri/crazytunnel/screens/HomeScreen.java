@@ -7,6 +7,7 @@ import android.widget.EditText;
 import android.widget.NumberPicker;
 import com.mauriciotogneri.crazytunnel.R;
 import com.mauriciotogneri.crazytunnel.activities.BaseFragment;
+import com.mauriciotogneri.crazytunnel.screens.lobby.ServerSelectionScreen;
 
 public class HomeScreen extends BaseFragment
 {
@@ -48,6 +49,10 @@ public class HomeScreen extends BaseFragment
 	private void joinMatch()
 	{
 		String playerName = getPlayerName();
+		
+		ServerSelectionScreen serverSelection = new ServerSelectionScreen();
+		serverSelection.setParameter(ServerSelectionScreen.PARAMETER_PLAYER_NAME, playerName);
+		openFragment(serverSelection);
 	}
 	
 	private String getPlayerName()

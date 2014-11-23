@@ -1,15 +1,25 @@
 package com.mauriciotogneri.crazytunnel.objects;
 
-import android.bluetooth.BluetoothDevice;
-
 public class Player
 {
-	public final BluetoothDevice device;
+	public final String macAddress;
 	public String name = "";
 	public int color = 0;
 	
-	public Player(BluetoothDevice device)
+	public Player(String macAddress)
 	{
-		this.device = device;
+		this.macAddress = macAddress;
+	}
+	
+	public Player(String macAddress, String name, int color)
+	{
+		this.macAddress = macAddress;
+		this.name = name;
+		this.color = color;
+	}
+	
+	public boolean isValid()
+	{
+		return (!this.name.isEmpty()) && (this.color != 0);
 	}
 }

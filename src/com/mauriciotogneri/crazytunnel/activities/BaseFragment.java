@@ -1,5 +1,7 @@
 package com.mauriciotogneri.crazytunnel.activities;
 
+import java.util.HashMap;
+import java.util.Map;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
@@ -12,6 +14,7 @@ public abstract class BaseFragment extends Fragment
 {
 	private View layout;
 	private BaseActivity baseActivity;
+	private final Map<String, Object> parameters = new HashMap<String, Object>();
 	
 	@Override
 	public final void onAttach(Activity activity)
@@ -46,6 +49,17 @@ public abstract class BaseFragment extends Fragment
 	{
 	}
 	
+	public void setParameter(String key, Object value)
+	{
+		this.parameters.put(key, value);
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected <Type> Type getParameter(String name)
+	{
+		return (Type)this.parameters.get(name);
+	}
+	
 	public Context getContext()
 	{
 		return this.baseActivity;
@@ -67,14 +81,6 @@ public abstract class BaseFragment extends Fragment
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected <Type> Type getParameter(String name)
-	{
-		Bundle parameters = getArguments();
-		
-		return (Type)parameters.get(name);
-	}
-	
-	@SuppressWarnings("unchecked")
 	protected <Type> Type findViewById(int id)
 	{
 		return (this.layout != null) ? (Type)this.layout.findViewById(id) : null;
@@ -85,14 +91,28 @@ public abstract class BaseFragment extends Fragment
 		this.baseActivity.openFragment(fragment);
 	}
 	
-	protected void showToast(String text)
+	protected void showToast(final String text)
 	{
-		this.baseActivity.showToast(text);
+		runOnUiThread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				BaseFragment.this.baseActivity.showToast(text);
+			}
+		});
 	}
 	
-	protected void showToast(int resourceId)
+	protected void showToast(final int resourceId)
 	{
-		this.baseActivity.showToast(resourceId);
+		runOnUiThread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				BaseFragment.this.baseActivity.showToast(resourceId);
+			}
+		});
 	}
 	
 	protected boolean allowBack()
