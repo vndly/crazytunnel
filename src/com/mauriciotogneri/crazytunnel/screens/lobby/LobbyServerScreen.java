@@ -281,7 +281,6 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 	@Override
 	public void onDisconnect(final BluetoothDevice device)
 	{
-		
 		playerDisconnected(device);
 	}
 	

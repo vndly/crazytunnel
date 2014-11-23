@@ -1,7 +1,5 @@
 package com.mauriciotogneri.crazytunnel.screens;
 
-import java.math.BigInteger;
-import java.security.SecureRandom;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -11,6 +9,7 @@ import com.mauriciotogneri.crazytunnel.R;
 import com.mauriciotogneri.crazytunnel.activities.BaseFragment;
 import com.mauriciotogneri.crazytunnel.screens.lobby.LobbyServerScreen;
 import com.mauriciotogneri.crazytunnel.screens.lobby.ServerSelectionScreen;
+import com.mauriciotogneri.crazytunnel.shapes.Preferences;
 
 public class HomeScreen extends BaseFragment
 {
@@ -43,7 +42,7 @@ public class HomeScreen extends BaseFragment
 		});
 		
 		EditText playerName = findViewById(R.id.player_name);
-		playerName.setText(new BigInteger(10, new SecureRandom()).toString(4));
+		playerName.setText(Preferences.getPlayerName());
 	}
 	
 	private void createMatch()
@@ -69,8 +68,11 @@ public class HomeScreen extends BaseFragment
 	private String getPlayerName()
 	{
 		EditText playerName = findViewById(R.id.player_name);
+		String result = playerName.getText().toString();
 		
-		return playerName.getText().toString();
+		Preferences.setPlayerName(result);
+		
+		return result;
 	}
 	
 	private int getNumberOfPlayers()
