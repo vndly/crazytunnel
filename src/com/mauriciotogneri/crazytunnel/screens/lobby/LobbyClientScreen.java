@@ -9,9 +9,12 @@ import com.mauriciotogneri.crazytunnel.R;
 import com.mauriciotogneri.crazytunnel.activities.BaseFragment;
 import com.mauriciotogneri.crazytunnel.connection.MessageReader;
 import com.mauriciotogneri.crazytunnel.connection.Messages;
+import com.mauriciotogneri.crazytunnel.connection.Messages.SetFinalPlayersList;
 import com.mauriciotogneri.crazytunnel.connection.Messages.SetPlayerColor;
 import com.mauriciotogneri.crazytunnel.connection.Messages.SetRegisteredPlayers;
 import com.mauriciotogneri.crazytunnel.objects.Player;
+import com.mauriciotogneri.crazytunnel.screens.game.GameConnection;
+import com.mauriciotogneri.crazytunnel.screens.game.GameScreen;
 
 public class LobbyClientScreen extends BaseFragment implements ClientEvent
 {
@@ -35,7 +38,7 @@ public class LobbyClientScreen extends BaseFragment implements ClientEvent
 		this.clientConnection = new ClientConnection(this);
 		this.clientConnection.connect(serverDevice, LobbyServerScreen.UUID);
 		
-		this.player = new Player(null);
+		this.player = new Player(this.clientConnection.getDeviceAddress());
 		this.player.name = playerName;
 	}
 	
@@ -67,6 +70,10 @@ public class LobbyClientScreen extends BaseFragment implements ClientEvent
 				case Messages.SetRegisteredPlayers.CODE:
 					processSetRegisteredPlayers(new SetRegisteredPlayers(reader));
 					break;
+				
+				case Messages.SetFinalPlayersList.CODE:
+					processSetFinalPlayersList(new SetFinalPlayersList(reader));
+					break;
 			}
 		}
 	}
@@ -88,6 +95,16 @@ public class LobbyClientScreen extends BaseFragment implements ClientEvent
 				refreshPlayerList(setRegisteredPlayers.players);
 			}
 		});
+	}
+	
+	private void processSetFinalPlayersList(SetFinalPlayersList setFinalPlayersList)
+	{
+		GameConnection gameConnection = new GameConnection(this.clientConnection);
+		
+		GameScreen gameScreen = new GameScreen();
+		gameScreen.setParameter(GameScreen.PARAMETER_GAME_CONNECTION, gameConnection);
+		gameScreen.setParameter(GameScreen.PARAMETER_PLAYERS, setFinalPlayersList.players);
+		openFragment(gameScreen);
 	}
 	
 	private void refreshPlayerList(Player[] players)
@@ -120,6 +137,6 @@ public class LobbyClientScreen extends BaseFragment implements ClientEvent
 	@Override
 	public void onDisconnect()
 	{
-		showToast("Server disconnected...");
+		showToast("Disconnected...");
 	}
 }

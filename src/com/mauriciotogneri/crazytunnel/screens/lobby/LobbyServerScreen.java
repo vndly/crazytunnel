@@ -22,6 +22,8 @@ import com.mauriciotogneri.crazytunnel.connection.MessageReader;
 import com.mauriciotogneri.crazytunnel.connection.Messages;
 import com.mauriciotogneri.crazytunnel.connection.Messages.SetPlayerName;
 import com.mauriciotogneri.crazytunnel.objects.Player;
+import com.mauriciotogneri.crazytunnel.screens.game.GameConnection;
+import com.mauriciotogneri.crazytunnel.screens.game.GameScreen;
 
 public class LobbyServerScreen extends BaseFragment implements ServerEvent
 {
@@ -70,8 +72,7 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
 			{
-				Player player = (Player)parent.getItemAtPosition(position);
-				// TODO
+				// Player player = (Player)parent.getItemAtPosition(position);
 			}
 		});
 		
@@ -167,8 +168,6 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 		}
 		
 		this.serverConnection.sendAll(Messages.SetRegisteredPlayers.create(list));
-		
-		showToast("SENDING BROADCAST OF REGISTERED PLAYERS");
 	}
 	
 	private int getFreeColor()
@@ -288,7 +287,24 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 	
 	private void startGame()
 	{
-		// TODO
+		List<Player> list = new ArrayList<Player>();
+		
+		for (Player player : this.registeredPlayers.values())
+		{
+			if (player.isValid())
+			{
+				list.add(player);
+			}
+		}
+		
+		this.serverConnection.sendAll(Messages.SetFinalPlayersList.create(list));
+		
+		GameConnection gameConnection = new GameConnection(this.serverConnection);
+		
+		GameScreen gameScreen = new GameScreen();
+		gameScreen.setParameter(GameScreen.PARAMETER_GAME_CONNECTION, gameConnection);
+		gameScreen.setParameter(GameScreen.PARAMETER_PLAYERS, list);
+		openFragment(gameScreen);
 	}
 	
 	@Override
