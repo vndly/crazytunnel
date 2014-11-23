@@ -8,6 +8,7 @@ import com.mauriciotogneri.bluetooth.connection.server.ServerEvent;
 
 public class GameConnection implements ClientEvent, ServerEvent
 {
+	private GameEvent gameEvent;
 	private final ServerConnection serverConnection;
 	private final ClientConnection clientConnection;
 	
@@ -25,19 +26,36 @@ public class GameConnection implements ClientEvent, ServerEvent
 	
 	public void setListener(GameEvent gameEvent)
 	{
-		// TODO
-	}
-	
-	public interface GameEvent
-	{
+		this.gameEvent = gameEvent;
 		
+		if (isClient())
+		{
+			this.clientConnection.setListener(this);
+		}
+		else
+		{
+			this.serverConnection.setListener(this);
+		}
 	}
 	
-	// ===================================================================
+	public boolean isClient()
+	{
+		return this.clientConnection != null;
+	}
+	
+	public boolean isServer()
+	{
+		return this.serverConnection != null;
+	}
+	
+	// ========================= SERVER ============================
 	
 	@Override
 	public void onReceive(BluetoothDevice device, byte[] message)
 	{
+		this.serverConnection.sendAll(device, message);
+		
+		this.gameEvent.onReceive(message);
 	}
 	
 	@Override
@@ -53,13 +71,15 @@ public class GameConnection implements ClientEvent, ServerEvent
 	@Override
 	public void onDisconnect(BluetoothDevice device)
 	{
+		this.gameEvent.playerDisconnect(device.getAddress());
 	}
 	
-	// ===================================================================
+	// =========================== CLIENT ==========================
 	
 	@Override
 	public void onReceive(byte[] message)
 	{
+		this.gameEvent.onReceive(message);
 	}
 	
 	@Override
@@ -75,5 +95,6 @@ public class GameConnection implements ClientEvent, ServerEvent
 	@Override
 	public void onDisconnect()
 	{
+		this.gameEvent.onDisconnect();
 	}
 }

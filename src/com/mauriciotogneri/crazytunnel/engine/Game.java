@@ -6,7 +6,7 @@ import com.mauriciotogneri.crazytunnel.input.InputEvent;
 import com.mauriciotogneri.crazytunnel.objects.Level;
 import com.mauriciotogneri.crazytunnel.objects.LevelDefinition;
 import com.mauriciotogneri.crazytunnel.objects.PlayerBox;
-import com.mauriciotogneri.crazytunnel.screens.game.GameConnection.GameEvent;
+import com.mauriciotogneri.crazytunnel.screens.game.GameEvent;
 import com.mauriciotogneri.crazytunnel.screens.game.GameScreen;
 import com.mauriciotogneri.crazytunnel.shapes.Rectangle;
 import com.mauriciotogneri.crazytunnel.shapes.Shape;
@@ -104,5 +104,25 @@ public class Game implements GameEvent
 	public void stop()
 	{
 		// TODO: STOP AUDIO
+	}
+	
+	// ========================= CONNECTION ======================
+	
+	@Override
+	public void onReceive(byte[] message)
+	{
+		// TODO
+	}
+	
+	@Override
+	public void playerDisconnect(String macAddress)
+	{
+		// TODO
+	}
+	
+	@Override
+	public void onDisconnect()
+	{
+		// TODO
 	}
 }
