@@ -25,7 +25,7 @@ public class GameScreen extends BaseFragment
 		
 		this.players = getParameter(GameScreen.PARAMETER_PLAYERS);
 		
-		this.game = new Game(this);
+		this.game = new Game(this, this.gameConnection, this.gameConnection.isServer());
 		this.gameConnection.setListener(this.game);
 		
 		this.screen = findViewById(R.id.glSurface);

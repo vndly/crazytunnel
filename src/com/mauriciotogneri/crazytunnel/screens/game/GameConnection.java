@@ -48,6 +48,16 @@ public class GameConnection implements ClientEvent, ServerEvent
 		return this.serverConnection != null;
 	}
 	
+	public void sendAll(byte[] message)
+	{
+		this.serverConnection.sendAll(message);
+	}
+	
+	public void send(byte[] message)
+	{
+		this.clientConnection.send(message);
+	}
+	
 	// ========================= SERVER ============================
 	
 	@Override

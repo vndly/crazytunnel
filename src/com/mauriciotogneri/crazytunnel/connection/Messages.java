@@ -126,4 +126,21 @@ public class Messages
 			return writer.getMessage();
 		}
 	}
+	
+	public static class StartRace
+	{
+		public static final byte CODE = 5;
+		
+		public StartRace()
+		{
+		}
+		
+		public static byte[] create()
+		{
+			MessageWriter writer = new MessageWriter();
+			writer.putByte(StartRace.CODE);
+			
+			return writer.getMessage();
+		}
+	}
 }

@@ -2,10 +2,14 @@ package com.mauriciotogneri.crazytunnel.engine;
 
 import android.graphics.Color;
 import android.os.Vibrator;
+import com.mauriciotogneri.crazytunnel.connection.MessageReader;
+import com.mauriciotogneri.crazytunnel.connection.Messages;
+import com.mauriciotogneri.crazytunnel.engine.Alarm.OnAlarmRing;
 import com.mauriciotogneri.crazytunnel.input.InputEvent;
 import com.mauriciotogneri.crazytunnel.objects.Level;
 import com.mauriciotogneri.crazytunnel.objects.LevelDefinition;
 import com.mauriciotogneri.crazytunnel.objects.PlayerBox;
+import com.mauriciotogneri.crazytunnel.screens.game.GameConnection;
 import com.mauriciotogneri.crazytunnel.screens.game.GameEvent;
 import com.mauriciotogneri.crazytunnel.screens.game.GameScreen;
 import com.mauriciotogneri.crazytunnel.shapes.Rectangle;
@@ -14,6 +18,8 @@ import com.mauriciotogneri.crazytunnel.shapes.Shape;
 public class Game implements GameEvent
 {
 	private final GameScreen gameScreen;
+	private final GameConnection gameConnection;
+	private final boolean isServer;
 	private Renderer renderer;
 	
 	private final Camera camera;
@@ -21,10 +27,34 @@ public class Game implements GameEvent
 	private PlayerBox playerBox;
 	private Level level;
 	
-	public Game(GameScreen gameScreen)
+	private final Alarm alarmCountdown;
+	
+	private GameStatus gameStatus = GameStatus.READY;
+	
+	private enum GameStatus
+	{
+		READY, // all the players in the starting line
+		COUNTDOWN, // the countdown is decreasing
+		RUNNING; // the race is on
+	}
+	
+	public Game(GameScreen gameScreen, GameConnection gameConnection, boolean isServer)
 	{
 		this.gameScreen = gameScreen;
+		this.gameConnection = gameConnection;
+		this.isServer = isServer;
 		this.camera = new Camera(Renderer.RESOLUTION_X, Renderer.RESOLUTION_Y);
+		
+		this.alarmCountdown = new Alarm(new OnAlarmRing()
+		{
+			@Override
+			public boolean onAlarmRing()
+			{
+				countdownFinished();
+				
+				return false;
+			}
+		}, 3 * 1000);
 	}
 	
 	public void start(Renderer renderer)
@@ -74,11 +104,37 @@ public class Game implements GameEvent
 	
 	public void update(float delta, InputEvent input, Renderer renderer)
 	{
-		this.playerBox.update(delta, input);
+		switch (this.gameStatus)
+		{
+			case RUNNING:
+				this.playerBox.update(delta, input);
+				
+				renderer.clearScreen(this.camera);
+				this.level.render(renderer);
+				this.playerBox.render(renderer);
+				break;
+			case COUNTDOWN:
+				break;
+			case READY:
+				if (this.isServer)
+				{
+					this.gameStatus = GameStatus.COUNTDOWN;
+					this.alarmCountdown.restart();
+				}
+				break;
+		}
+	}
+	
+	private void countdownFinished()
+	{
+		this.gameConnection.sendAll(Messages.StartRace.create());
 		
-		renderer.clearScreen(this.camera);
-		this.level.render(renderer);
-		this.playerBox.render(renderer);
+		startRace();
+	}
+	
+	private void startRace()
+	{
+		this.gameStatus = GameStatus.RUNNING;
 	}
 	
 	// ======================== LIFE CYCLE ====================== \\
@@ -111,7 +167,18 @@ public class Game implements GameEvent
 	@Override
 	public void onReceive(byte[] message)
 	{
-		// TODO
+		if (message.length > 0)
+		{
+			MessageReader reader = new MessageReader(message);
+			byte code = reader.getByte();
+			
+			switch (code)
+			{
+				case Messages.StartRace.CODE:
+					startRace();
+					break;
+			}
+		}
 	}
 	
 	@Override

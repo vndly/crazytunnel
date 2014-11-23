@@ -2,36 +2,40 @@ package com.mauriciotogneri.crazytunnel.engine;
 
 public class Alarm
 {
-	private final int id;
 	private final OnAlarmRing callback;
-	private final long time;
-	private float total = 0;
+	private final long duration; // in milliseconds
+	private float timeElapsed = 0;
+	private boolean activated = false;
 	
-	public Alarm(int id, OnAlarmRing listener, long time)
+	public Alarm(OnAlarmRing listener, long duration)
 	{
-		this.id = id;
 		this.callback = listener;
-		this.time = time;
-		this.total = 0;
+		this.duration = duration;
 	}
 	
-	public int getId()
+	public void step(float delta)
 	{
-		return this.id;
-	}
-	
-	public boolean step(float delta)
-	{
-		boolean remove = false;
-		this.total += (delta * 1E3f);
-		
-		if (this.total >= this.time)
+		if (this.activated)
 		{
-			remove = (!this.callback.onAlarmRing());
-			this.total -= this.time;
+			this.timeElapsed += (delta * 1E3f);
+			
+			if (this.timeElapsed >= this.duration)
+			{
+				this.activated = this.callback.onAlarmRing();
+				this.timeElapsed -= this.duration;
+			}
 		}
-		
-		return remove;
+	}
+	
+	public void restart()
+	{
+		this.timeElapsed = 0;
+		this.activated = true;
+	}
+	
+	public boolean isActivated()
+	{
+		return this.activated;
 	}
 	
 	public interface OnAlarmRing
