@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Crazy Tunnel</string>
+    
+    <string name="home_create_game">Create game</string>
+    <string name="home_join_game">Join game</string>
+
+</resources>
