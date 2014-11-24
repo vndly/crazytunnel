@@ -41,6 +41,19 @@ public class MessageReader
 		return 0;
 	}
 	
+	public float getFloat()
+	{
+		try
+		{
+			return this.dataStream.readFloat();
+		}
+		catch (IOException e)
+		{
+		}
+		
+		return 0;
+	}
+	
 	public String getString()
 	{
 		try

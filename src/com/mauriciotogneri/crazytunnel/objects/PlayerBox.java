@@ -19,13 +19,13 @@ public class PlayerBox
 	
 	private float acceleration = 0;
 	
-	private static final int GRAVITY = 1;
-	private static final int JUMP_FORCE = 3;
+	private static final float GRAVITY = 1 * 0.1f;
+	private static final float JUMP_FORCE = 3;
 	
-	private static final int SPEED = 40;
+	private static final float SPEED = 40 * 0.1f;
 	
-	private static final int MAX_ACCELERATION_UP = 30;
-	private static final int MAX_ACCELERATION_DOWN = 30;
+	private static final float MAX_ACCELERATION_UP = 30 * 0.1f;
+	private static final float MAX_ACCELERATION_DOWN = 30 * 0.1f;
 	
 	private static final int SIZE = 5;
 	
@@ -70,9 +70,17 @@ public class PlayerBox
 			{
 				this.sprite.y = Renderer.RESOLUTION_Y - PlayerBox.SIZE;
 			}
-			
-			focusCamera(this.camera, this.sprite.x);
 		}
+	}
+	
+	public float getX()
+	{
+		return this.sprite.x;
+	}
+	
+	public float getY()
+	{
+		return this.sprite.y;
 	}
 	
 	private float getSpeed()
@@ -110,10 +118,5 @@ public class PlayerBox
 		{
 			this.sprite.render(renderer);
 		}
-	}
-	
-	private void focusCamera(Camera camera, float x)
-	{
-		camera.x = x - 40;
 	}
 }

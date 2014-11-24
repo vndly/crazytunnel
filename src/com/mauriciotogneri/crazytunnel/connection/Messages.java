@@ -3,6 +3,7 @@ package com.mauriciotogneri.crazytunnel.connection;
 import java.util.ArrayList;
 import java.util.List;
 import com.mauriciotogneri.crazytunnel.objects.Player;
+import com.mauriciotogneri.crazytunnel.objects.PlayerBox;
 
 public class Messages
 {
@@ -142,6 +143,33 @@ public class Messages
 		{
 			MessageWriter writer = new MessageWriter();
 			writer.putByte(StartRace.CODE);
+			
+			return writer.getMessage();
+		}
+	}
+	
+	public static class SetPlayerBoxPosition
+	{
+		public final byte playerId;
+		public final float x;
+		public final float y;
+		
+		public static final byte CODE = 6;
+		
+		public SetPlayerBoxPosition(MessageReader reader)
+		{
+			this.playerId = reader.getByte();
+			this.x = reader.getFloat();
+			this.y = reader.getFloat();
+		}
+		
+		public static byte[] create(Player player, PlayerBox box)
+		{
+			MessageWriter writer = new MessageWriter();
+			writer.putByte(SetPlayerBoxPosition.CODE);
+			writer.putByte(player.id);
+			writer.putFloat(box.getX());
+			writer.putFloat(box.getY());
 			
 			return writer.getMessage();
 		}

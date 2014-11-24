@@ -37,6 +37,17 @@ public class MessageWriter
 		}
 	}
 	
+	public void putFloat(float value)
+	{
+		try
+		{
+			this.dataStream.writeFloat(value);
+		}
+		catch (IOException e)
+		{
+		}
+	}
+	
 	public void putString(String value)
 	{
 		try

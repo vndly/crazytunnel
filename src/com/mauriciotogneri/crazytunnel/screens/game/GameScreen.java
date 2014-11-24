@@ -46,7 +46,7 @@ public class GameScreen extends BaseFragment
 		{
 			if (currentPlayer.id != player.id)
 			{
-				result.add(player);
+				result.add(currentPlayer);
 				break;
 			}
 		}

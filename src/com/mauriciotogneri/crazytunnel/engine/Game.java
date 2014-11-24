@@ -1,11 +1,12 @@
 package com.mauriciotogneri.crazytunnel.engine;
 
-import java.util.ArrayList;
 import java.util.List;
 import android.graphics.Color;
 import android.os.Vibrator;
+import android.util.SparseArray;
 import com.mauriciotogneri.crazytunnel.connection.MessageReader;
 import com.mauriciotogneri.crazytunnel.connection.Messages;
+import com.mauriciotogneri.crazytunnel.connection.Messages.SetPlayerBoxPosition;
 import com.mauriciotogneri.crazytunnel.engine.Alarm.OnAlarmRing;
 import com.mauriciotogneri.crazytunnel.input.InputEvent;
 import com.mauriciotogneri.crazytunnel.objects.EnemyBox;
@@ -32,7 +33,9 @@ public class Game implements GameEvent
 	private final Camera camera;
 	
 	private PlayerBox playerBox;
-	private final List<EnemyBox> enemyBox = new ArrayList<EnemyBox>();
+	
+	private final Object enemyBoxesLock = new Object();
+	private final SparseArray<EnemyBox> enemyBoxes = new SparseArray<EnemyBox>();
 	
 	private Level level;
 	
@@ -82,6 +85,12 @@ public class Game implements GameEvent
 			this.level = new Level(this.camera, levelDefinition);
 			this.playerBox = new PlayerBox(this.camera, this.level, vibrator, 0, Renderer.RESOLUTION_Y / 2, this.player.color);
 			
+			for (Player player : this.enemyPlayers)
+			{
+				EnemyBox box = new EnemyBox(0, Renderer.RESOLUTION_Y / 2, player.color);
+				this.enemyBoxes.put(player.id, box);
+			}
+			
 			restart();
 		}
 	}
@@ -123,6 +132,7 @@ public class Game implements GameEvent
 		{
 			case RUNNING:
 				this.playerBox.update(delta, input);
+				sendBoxPosition(this.player, this.playerBox);
 				break;
 			case COUNTDOWN:
 				break;
@@ -136,13 +146,34 @@ public class Game implements GameEvent
 		}
 		
 		renderer.clearScreen(this.camera);
+		focusCamera(this.camera, this.playerBox);
 		this.level.render(renderer);
+		
+		synchronized (this.enemyBoxesLock)
+		{
+			for (int i = 0, size = this.enemyBoxes.size(); i < size; i++)
+			{
+				EnemyBox box = this.enemyBoxes.valueAt(i);
+				box.render(renderer);
+			}
+		}
+		
 		this.playerBox.render(renderer);
+	}
+	
+	private void sendBoxPosition(Player player, PlayerBox box)
+	{
+		this.gameConnection.send(Messages.SetPlayerBoxPosition.create(player, box));
+	}
+	
+	private void focusCamera(Camera camera, PlayerBox playerBox)
+	{
+		camera.x = playerBox.getX() - 40;
 	}
 	
 	private void countdownFinished()
 	{
-		this.gameConnection.sendAll(Messages.StartRace.create());
+		this.gameConnection.send(Messages.StartRace.create());
 		
 		startRace();
 	}
@@ -150,6 +181,15 @@ public class Game implements GameEvent
 	private void startRace()
 	{
 		this.gameStatus = GameStatus.RUNNING;
+	}
+	
+	private void updateBoxPosition(SetPlayerBoxPosition setPlayerBoxPosition)
+	{
+		synchronized (this.enemyBoxesLock)
+		{
+			EnemyBox box = this.enemyBoxes.get(setPlayerBoxPosition.playerId);
+			box.update(setPlayerBoxPosition.x, setPlayerBoxPosition.y);
+		}
 	}
 	
 	// ======================== LIFE CYCLE ====================== \\
@@ -191,6 +231,10 @@ public class Game implements GameEvent
 			{
 				case Messages.StartRace.CODE:
 					startRace();
+					break;
+				
+				case Messages.SetPlayerBoxPosition.CODE:
+					updateBoxPosition(new SetPlayerBoxPosition(reader));
 					break;
 			}
 		}
