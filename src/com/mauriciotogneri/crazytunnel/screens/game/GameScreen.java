@@ -16,6 +16,7 @@ public class GameScreen extends BaseFragment
 	private CustomSurfaceView screen;
 	
 	public static final String PARAMETER_GAME_CONNECTION = "game_connection";
+	public static final String PARAMETER_PLAYER = "player";
 	public static final String PARAMETER_PLAYERS = "players";
 	
 	@Override
@@ -23,42 +24,27 @@ public class GameScreen extends BaseFragment
 	{
 		this.gameConnection = getParameter(GameScreen.PARAMETER_GAME_CONNECTION);
 		
+		Player player = getParameter(GameScreen.PARAMETER_PLAYER);
 		List<Player> players = getParameter(GameScreen.PARAMETER_PLAYERS);
 		
-		String macAddress = this.gameConnection.getMacAddress();
-		Player player = getPlayer(macAddress, players);
-		List<Player> enemyPlayers = getEnemyPlayers(macAddress, players);
+		List<Player> enemyPlayers = getEnemyPlayers(player, players);
 		
 		this.game = new Game(this, this.gameConnection, player, enemyPlayers, this.gameConnection.isServer());
 		this.gameConnection.setListener(this.game);
 		
 		this.screen = findViewById(R.id.glSurface);
 		this.screen.setRenderer(new Renderer(this.game, getContext(), this.screen));
+		
+		showToast("PLAYING AS : " + player.id);
 	}
 	
-	private Player getPlayer(String macAddress, List<Player> players)
-	{
-		Player result = null;
-		
-		for (Player player : players)
-		{
-			if (player.macAddress.equals(macAddress))
-			{
-				result = player;
-				break;
-			}
-		}
-		
-		return result;
-	}
-	
-	private List<Player> getEnemyPlayers(String macAddress, List<Player> players)
+	private List<Player> getEnemyPlayers(Player player, List<Player> players)
 	{
 		List<Player> result = new ArrayList<Player>();
 		
-		for (Player player : players)
+		for (Player currentPlayer : players)
 		{
-			if (!player.macAddress.equals(macAddress))
+			if (currentPlayer.id != player.id)
 			{
 				result.add(player);
 				break;

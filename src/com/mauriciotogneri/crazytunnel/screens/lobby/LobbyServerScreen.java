@@ -31,6 +31,9 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 	private ServerConnection serverConnection;
 	private PlayerAdapter playerAdapter;
 	
+	private final Object playerIdLock = new Object();
+	private byte nextPlayerId = 1;
+	
 	private static final int VISIBILITY_DURATION = 60;
 	public static final String UUID = "e6c3c895-1dcf-4a8d-9e75-9c57c9123cb9";
 	
@@ -89,7 +92,8 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 		if (acquireColor(freeColor))
 		{
 			String playerName = getParameter(LobbyServerScreen.PARAMETER_PLAYER_NAME);
-			this.player = new Player(this.serverConnection.getDeviceAddress(), playerName, freeColor);
+			byte id = getNextPlayerId();
+			this.player = new Player(id, playerName, freeColor);
 			this.registeredPlayers.put(this.serverConnection.getDeviceAddress(), this.player);
 			this.playerAdapter.add(this.player);
 		}
@@ -221,13 +225,26 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 		
 		if (!this.registeredPlayers.containsKey(macAddress))
 		{
-			Player player = new Player(macAddress);
+			byte id = getNextPlayerId();
+			Player player = new Player(id);
 			this.registeredPlayers.put(macAddress, player);
 			this.playerDevices.put(player, device);
 			
 			int freeColor = getFreeColor();
-			send(player, Messages.SetPlayerColor.create(freeColor));
+			send(player, Messages.SetPlayerInfo.create(id, freeColor));
 		}
+	}
+	
+	private byte getNextPlayerId()
+	{
+		byte result = 0;
+		
+		synchronized (this.playerIdLock)
+		{
+			result = this.nextPlayerId++;
+		}
+		
+		return result;
 	}
 	
 	private void playerDisconnected(BluetoothDevice device)
@@ -303,6 +320,7 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 		
 		GameScreen gameScreen = new GameScreen();
 		gameScreen.setParameter(GameScreen.PARAMETER_GAME_CONNECTION, gameConnection);
+		gameScreen.setParameter(GameScreen.PARAMETER_PLAYER, this.player);
 		gameScreen.setParameter(GameScreen.PARAMETER_PLAYERS, list);
 		openFragment(gameScreen);
 	}

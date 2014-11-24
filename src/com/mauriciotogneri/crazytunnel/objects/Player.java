@@ -2,18 +2,22 @@ package com.mauriciotogneri.crazytunnel.objects;
 
 public class Player
 {
-	public final String macAddress;
+	public byte id = 0;
 	public String name = "";
 	public int color = 0;
 	
-	public Player(String macAddress)
+	public Player()
 	{
-		this.macAddress = macAddress;
 	}
 	
-	public Player(String macAddress, String name, int color)
+	public Player(byte id)
 	{
-		this.macAddress = macAddress;
+		this.id = id;
+	}
+	
+	public Player(byte id, String name, int color)
+	{
+		this.id = id;
 		this.name = name;
 		this.color = color;
 	}

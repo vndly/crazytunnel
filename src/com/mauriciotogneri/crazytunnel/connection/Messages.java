@@ -6,21 +6,24 @@ import com.mauriciotogneri.crazytunnel.objects.Player;
 
 public class Messages
 {
-	public static class SetPlayerColor
+	public static class SetPlayerInfo
 	{
+		public final byte id;
 		public final int color;
 		
 		public static final byte CODE = 1;
 		
-		public SetPlayerColor(MessageReader reader)
+		public SetPlayerInfo(MessageReader reader)
 		{
+			this.id = reader.getByte();
 			this.color = reader.getInt();
 		}
 		
-		public static byte[] create(int color)
+		public static byte[] create(byte id, int color)
 		{
 			MessageWriter writer = new MessageWriter();
-			writer.putByte(SetPlayerColor.CODE);
+			writer.putByte(SetPlayerInfo.CODE);
+			writer.putByte(id);
 			writer.putInt(color);
 			
 			return writer.getMessage();
@@ -63,11 +66,11 @@ public class Messages
 			
 			for (int i = 0; i < this.players.length; i++)
 			{
-				String macAddress = reader.getString();
+				byte id = reader.getByte();
 				String name = reader.getString();
 				int color = reader.getInt();
 				
-				this.players[i] = new Player(macAddress, name, color);
+				this.players[i] = new Player(id, name, color);
 			}
 		}
 		
@@ -79,7 +82,7 @@ public class Messages
 			
 			for (Player player : players)
 			{
-				writer.putString(player.macAddress);
+				writer.putByte(player.id);
 				writer.putString(player.name);
 				writer.putInt(player.color);
 			}
@@ -102,11 +105,11 @@ public class Messages
 			
 			for (int i = 0; i < length; i++)
 			{
-				String macAddress = reader.getString();
+				byte id = reader.getByte();
 				String name = reader.getString();
 				int color = reader.getInt();
 				
-				this.players.add(new Player(macAddress, name, color));
+				this.players.add(new Player(id, name, color));
 			}
 		}
 		
@@ -118,7 +121,7 @@ public class Messages
 			
 			for (Player player : players)
 			{
-				writer.putString(player.macAddress);
+				writer.putByte(player.id);
 				writer.putString(player.name);
 				writer.putInt(player.color);
 			}

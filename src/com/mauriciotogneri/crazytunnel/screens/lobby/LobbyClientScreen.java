@@ -10,7 +10,7 @@ import com.mauriciotogneri.crazytunnel.activities.BaseFragment;
 import com.mauriciotogneri.crazytunnel.connection.MessageReader;
 import com.mauriciotogneri.crazytunnel.connection.Messages;
 import com.mauriciotogneri.crazytunnel.connection.Messages.SetFinalPlayersList;
-import com.mauriciotogneri.crazytunnel.connection.Messages.SetPlayerColor;
+import com.mauriciotogneri.crazytunnel.connection.Messages.SetPlayerInfo;
 import com.mauriciotogneri.crazytunnel.connection.Messages.SetRegisteredPlayers;
 import com.mauriciotogneri.crazytunnel.objects.Player;
 import com.mauriciotogneri.crazytunnel.screens.game.GameConnection;
@@ -38,7 +38,7 @@ public class LobbyClientScreen extends BaseFragment implements ClientEvent
 		this.clientConnection = new ClientConnection(this);
 		this.clientConnection.connect(serverDevice, LobbyServerScreen.UUID);
 		
-		this.player = new Player(this.clientConnection.getDeviceAddress());
+		this.player = new Player();
 		this.player.name = playerName;
 	}
 	
@@ -63,8 +63,8 @@ public class LobbyClientScreen extends BaseFragment implements ClientEvent
 			
 			switch (code)
 			{
-				case Messages.SetPlayerColor.CODE:
-					processSetPlayerColor(new SetPlayerColor(reader));
+				case Messages.SetPlayerInfo.CODE:
+					processSetPlayerInfo(new SetPlayerInfo(reader));
 					break;
 				
 				case Messages.SetRegisteredPlayers.CODE:
@@ -78,9 +78,10 @@ public class LobbyClientScreen extends BaseFragment implements ClientEvent
 		}
 	}
 	
-	private void processSetPlayerColor(SetPlayerColor setPlayerColor)
+	private void processSetPlayerInfo(SetPlayerInfo setPlayerInfo)
 	{
-		this.player.color = setPlayerColor.color;
+		this.player.id = setPlayerInfo.id;
+		this.player.color = setPlayerInfo.color;
 		
 		send(Messages.SetPlayerName.create(this.player.name, this.player.color));
 	}
@@ -103,6 +104,7 @@ public class LobbyClientScreen extends BaseFragment implements ClientEvent
 		
 		GameScreen gameScreen = new GameScreen();
 		gameScreen.setParameter(GameScreen.PARAMETER_GAME_CONNECTION, gameConnection);
+		gameScreen.setParameter(GameScreen.PARAMETER_PLAYER, this.player);
 		gameScreen.setParameter(GameScreen.PARAMETER_PLAYERS, setFinalPlayersList.players);
 		openFragment(gameScreen);
 	}
