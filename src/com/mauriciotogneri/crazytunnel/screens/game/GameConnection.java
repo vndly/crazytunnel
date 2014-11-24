@@ -77,9 +77,6 @@ public class GameConnection implements ClientEvent, ServerEvent
 	@Override
 	public void onReceive(BluetoothDevice device, byte[] message)
 	{
-		// TODO: ???
-		// this.serverConnection.sendAll(device, message, false);
-		
 		this.gameEvent.onReceive(message);
 	}
 	

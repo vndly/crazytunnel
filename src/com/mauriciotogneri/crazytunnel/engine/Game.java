@@ -3,6 +3,7 @@ package com.mauriciotogneri.crazytunnel.engine;
 import java.util.List;
 import android.graphics.Color;
 import android.os.Vibrator;
+import android.util.Log;
 import android.util.SparseArray;
 import com.mauriciotogneri.crazytunnel.connection.MessageReader;
 import com.mauriciotogneri.crazytunnel.connection.Messages;
@@ -34,7 +35,6 @@ public class Game implements GameEvent
 	
 	private PlayerBox playerBox;
 	
-	private final Object enemyBoxesLock = new Object();
 	private final SparseArray<EnemyBox> enemyBoxes = new SparseArray<EnemyBox>();
 	
 	private Level level;
@@ -184,11 +184,21 @@ public class Game implements GameEvent
 	{
 		if (this.isServer)
 		{
+			Log.e("TEST", "***************************");
 			this.gameConnection.send(setPlayerBoxPosition.create(), false);
 		}
 		
+		Log.e("TEST", "RECEIVING UPDATE BOX POSITION");
 		EnemyBox box = this.enemyBoxes.get(setPlayerBoxPosition.playerId);
-		box.update(setPlayerBoxPosition.x, setPlayerBoxPosition.y);
+		
+		if (box != null)
+		{
+			box.update(setPlayerBoxPosition.x, setPlayerBoxPosition.y);
+		}
+		else
+		{
+			Log.e("TEST", "ERROR");
+		}
 	}
 	
 	// ======================== LIFE CYCLE ====================== \\
