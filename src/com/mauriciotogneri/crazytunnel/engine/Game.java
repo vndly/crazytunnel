@@ -132,7 +132,7 @@ public class Game implements GameEvent
 		{
 			case RUNNING:
 				this.playerBox.update(delta, input);
-				sendBoxPosition(this.player, this.playerBox);
+				broadcastBoxPosition(this.player, this.playerBox);
 				break;
 			case COUNTDOWN:
 				break;
@@ -149,21 +149,18 @@ public class Game implements GameEvent
 		focusCamera(this.camera, this.playerBox);
 		this.level.render(renderer);
 		
-		synchronized (this.enemyBoxesLock)
+		for (int i = 0, size = this.enemyBoxes.size(); i < size; i++)
 		{
-			for (int i = 0, size = this.enemyBoxes.size(); i < size; i++)
-			{
-				EnemyBox box = this.enemyBoxes.valueAt(i);
-				box.render(renderer);
-			}
+			EnemyBox box = this.enemyBoxes.valueAt(i);
+			box.render(renderer);
 		}
 		
 		this.playerBox.render(renderer);
 	}
 	
-	private void sendBoxPosition(Player player, PlayerBox box)
+	private void broadcastBoxPosition(Player player, PlayerBox box)
 	{
-		this.gameConnection.send(Messages.SetPlayerBoxPosition.create(player, box));
+		this.gameConnection.send(Messages.SetPlayerBoxPosition.create(player, box), false);
 	}
 	
 	private void focusCamera(Camera camera, PlayerBox playerBox)
@@ -173,7 +170,7 @@ public class Game implements GameEvent
 	
 	private void countdownFinished()
 	{
-		this.gameConnection.send(Messages.StartRace.create());
+		this.gameConnection.send(Messages.StartRace.create(), true);
 		
 		startRace();
 	}
@@ -185,11 +182,13 @@ public class Game implements GameEvent
 	
 	private void updateBoxPosition(SetPlayerBoxPosition setPlayerBoxPosition)
 	{
-		synchronized (this.enemyBoxesLock)
+		if (this.isServer)
 		{
-			EnemyBox box = this.enemyBoxes.get(setPlayerBoxPosition.playerId);
-			box.update(setPlayerBoxPosition.x, setPlayerBoxPosition.y);
+			this.gameConnection.send(setPlayerBoxPosition.create(), false);
 		}
+		
+		EnemyBox box = this.enemyBoxes.get(setPlayerBoxPosition.playerId);
+		box.update(setPlayerBoxPosition.x, setPlayerBoxPosition.y);
 	}
 	
 	// ======================== LIFE CYCLE ====================== \\

@@ -44,7 +44,7 @@ public class LobbyClientScreen extends BaseFragment implements ClientEvent
 	
 	private void send(byte[] message)
 	{
-		this.clientConnection.send(message);
+		this.clientConnection.send(message, true);
 	}
 	
 	@Override

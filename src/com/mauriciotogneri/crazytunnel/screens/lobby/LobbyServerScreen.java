@@ -105,7 +105,7 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 		
 		if (device != null)
 		{
-			this.serverConnection.send(device, message);
+			this.serverConnection.send(device, message, true);
 		}
 	}
 	
@@ -171,7 +171,7 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 			}
 		}
 		
-		this.serverConnection.sendAll(Messages.SetRegisteredPlayers.create(list));
+		this.serverConnection.sendAll(Messages.SetRegisteredPlayers.create(list), true);
 	}
 	
 	private int getFreeColor()
@@ -314,7 +314,7 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 			}
 		}
 		
-		this.serverConnection.sendAll(Messages.SetFinalPlayersList.create(list));
+		this.serverConnection.sendAll(Messages.SetFinalPlayersList.create(list), true);
 		
 		GameConnection gameConnection = new GameConnection(this.serverConnection);
 		

@@ -60,15 +60,15 @@ public class GameConnection implements ClientEvent, ServerEvent
 		return this.serverConnection != null;
 	}
 	
-	public void send(byte[] message)
+	public void send(byte[] message, boolean force)
 	{
 		if (isClient())
 		{
-			this.clientConnection.send(message);
+			this.clientConnection.send(message, force);
 		}
 		else
 		{
-			this.serverConnection.sendAll(message);
+			this.serverConnection.sendAll(message, force);
 		}
 	}
 	
@@ -77,7 +77,8 @@ public class GameConnection implements ClientEvent, ServerEvent
 	@Override
 	public void onReceive(BluetoothDevice device, byte[] message)
 	{
-		this.serverConnection.sendAll(device, message);
+		// TODO: ???
+		// this.serverConnection.sendAll(device, message, false);
 		
 		this.gameEvent.onReceive(message);
 	}

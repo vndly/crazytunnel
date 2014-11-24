@@ -163,6 +163,17 @@ public class Messages
 			this.y = reader.getFloat();
 		}
 		
+		public byte[] create()
+		{
+			MessageWriter writer = new MessageWriter();
+			writer.putByte(SetPlayerBoxPosition.CODE);
+			writer.putByte(this.playerId);
+			writer.putFloat(this.x);
+			writer.putFloat(this.y);
+			
+			return writer.getMessage();
+		}
+		
 		public static byte[] create(Player player, PlayerBox box)
 		{
 			MessageWriter writer = new MessageWriter();
