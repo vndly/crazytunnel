@@ -34,8 +34,6 @@ public class GameScreen extends BaseFragment
 		
 		this.screen = findViewById(R.id.glSurface);
 		this.screen.setRenderer(new Renderer(this.game, getContext(), this.screen));
-		
-		showToast("PLAYING AS : " + player.id);
 	}
 	
 	private List<Player> getEnemyPlayers(Player player, List<Player> players)
@@ -51,6 +49,12 @@ public class GameScreen extends BaseFragment
 		}
 		
 		return result;
+	}
+	
+	public void disconnected()
+	{
+		showToast("DISCONNECTED");
+		close();
 	}
 	
 	@Override

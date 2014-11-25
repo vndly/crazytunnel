@@ -184,21 +184,47 @@ public class Game implements GameEvent
 	{
 		if (this.isServer)
 		{
-			Log.e("TEST", "***************************");
-			this.gameConnection.send(setPlayerBoxPosition.create(), false);
+			Log.e("TEST2", "***************************");
+			Player player = getPlayerById(setPlayerBoxPosition.playerId);
+			
+			if (player != null)
+			{
+				this.gameConnection.send(player.macAddress, setPlayerBoxPosition.create(), false);
+			}
+			else
+			{
+				Log.e("TEST2", setPlayerBoxPosition.playerId + ": -------------------------------");
+			}
 		}
 		
-		Log.e("TEST", "RECEIVING UPDATE BOX POSITION");
+		Log.e("TEST2", "RECEIVING UPDATE BOX POSITION");
 		EnemyBox box = this.enemyBoxes.get(setPlayerBoxPosition.playerId);
 		
 		if (box != null)
 		{
+			Log.e("TEST2", "UPDATING BOX");
 			box.update(setPlayerBoxPosition.x, setPlayerBoxPosition.y);
 		}
 		else
 		{
-			Log.e("TEST", "ERROR");
+			Log.e("TEST2", "ERROR");
 		}
+	}
+	
+	private Player getPlayerById(int id)
+	{
+		Player result = null;
+		
+		for (Player player : this.enemyPlayers)
+		{
+			if (player.id == id)
+			{
+				result = player;
+				break;
+			}
+		}
+		
+		return result;
 	}
 	
 	// ======================== LIFE CYCLE ====================== \\
@@ -258,6 +284,6 @@ public class Game implements GameEvent
 	@Override
 	public void onDisconnect()
 	{
-		// TODO
+		this.gameScreen.disconnected();
 	}
 }

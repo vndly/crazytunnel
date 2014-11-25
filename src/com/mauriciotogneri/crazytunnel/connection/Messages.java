@@ -68,10 +68,11 @@ public class Messages
 			for (int i = 0; i < this.players.length; i++)
 			{
 				byte id = reader.getByte();
+				String macAddress = reader.getString();
 				String name = reader.getString();
 				int color = reader.getInt();
 				
-				this.players[i] = new Player(id, name, color);
+				this.players[i] = new Player(id, macAddress, name, color);
 			}
 		}
 		
@@ -84,6 +85,7 @@ public class Messages
 			for (Player player : players)
 			{
 				writer.putByte(player.id);
+				writer.putString(player.macAddress);
 				writer.putString(player.name);
 				writer.putInt(player.color);
 			}
@@ -107,10 +109,11 @@ public class Messages
 			for (int i = 0; i < length; i++)
 			{
 				byte id = reader.getByte();
+				String macAddress = reader.getString();
 				String name = reader.getString();
 				int color = reader.getInt();
 				
-				this.players.add(new Player(id, name, color));
+				this.players.add(new Player(id, macAddress, name, color));
 			}
 		}
 		
@@ -123,6 +126,7 @@ public class Messages
 			for (Player player : players)
 			{
 				writer.putByte(player.id);
+				writer.putString(player.macAddress);
 				writer.putString(player.name);
 				writer.putInt(player.color);
 			}

@@ -72,6 +72,14 @@ public class GameConnection implements ClientEvent, ServerEvent
 		}
 	}
 	
+	public void send(String macAddress, byte[] message, boolean force)
+	{
+		if (isServer())
+		{
+			this.serverConnection.sendAll(macAddress, message, force);
+		}
+	}
+	
 	// ========================= SERVER ============================
 	
 	@Override

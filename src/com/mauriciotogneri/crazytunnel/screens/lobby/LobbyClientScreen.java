@@ -38,7 +38,7 @@ public class LobbyClientScreen extends BaseFragment implements ClientEvent
 		this.clientConnection = new ClientConnection(this);
 		this.clientConnection.connect(serverDevice, LobbyServerScreen.UUID);
 		
-		this.player = new Player();
+		this.player = new Player(this.clientConnection.getDeviceAddress());
 		this.player.name = playerName;
 	}
 	

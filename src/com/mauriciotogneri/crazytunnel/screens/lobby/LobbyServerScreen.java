@@ -38,7 +38,6 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 	public static final String UUID = "e6c3c895-1dcf-4a8d-9e75-9c57c9123cb9";
 	
 	private final Map<String, Player> registeredPlayers = new HashMap<String, Player>();
-	private final Map<Player, BluetoothDevice> playerDevices = new HashMap<Player, BluetoothDevice>();
 	
 	private final Object colorLock = new Object();
 	private final SparseBooleanArray colorIndex = new SparseBooleanArray();
@@ -93,7 +92,7 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 		{
 			String playerName = getParameter(LobbyServerScreen.PARAMETER_PLAYER_NAME);
 			byte id = getNextPlayerId();
-			this.player = new Player(id, playerName, freeColor);
+			this.player = new Player(id, this.serverConnection.getDeviceAddress(), playerName, freeColor);
 			this.registeredPlayers.put(this.serverConnection.getDeviceAddress(), this.player);
 			this.playerAdapter.add(this.player);
 		}
@@ -101,12 +100,7 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 	
 	private void send(Player player, byte[] message)
 	{
-		BluetoothDevice device = this.playerDevices.get(player);
-		
-		if (device != null)
-		{
-			this.serverConnection.send(device, message, true);
-		}
+		this.serverConnection.send(player.macAddress, message, true);
 	}
 	
 	@Override
@@ -226,9 +220,8 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 		if (!this.registeredPlayers.containsKey(macAddress))
 		{
 			byte id = getNextPlayerId();
-			Player player = new Player(id);
+			Player player = new Player(id, macAddress);
 			this.registeredPlayers.put(macAddress, player);
-			this.playerDevices.put(player, device);
 			
 			int freeColor = getFreeColor();
 			send(player, Messages.SetPlayerInfo.create(id, freeColor));
