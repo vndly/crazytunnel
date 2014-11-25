@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import android.bluetooth.BluetoothDevice;
 import android.graphics.Color;
-import android.util.SparseBooleanArray;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -21,6 +20,7 @@ import com.mauriciotogneri.crazytunnel.activities.BaseFragment;
 import com.mauriciotogneri.crazytunnel.connection.MessageReader;
 import com.mauriciotogneri.crazytunnel.connection.Messages;
 import com.mauriciotogneri.crazytunnel.connection.Messages.SetPlayerName;
+import com.mauriciotogneri.crazytunnel.objects.ColorDefinition;
 import com.mauriciotogneri.crazytunnel.objects.Player;
 import com.mauriciotogneri.crazytunnel.screens.game.GameConnection;
 import com.mauriciotogneri.crazytunnel.screens.game.GameScreen;
@@ -40,7 +40,7 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 	private final Map<String, Player> registeredPlayers = new HashMap<String, Player>();
 	
 	private final Object colorLock = new Object();
-	private final SparseBooleanArray colorIndex = new SparseBooleanArray();
+	private final List<ColorDefinition> colorIndex = new ArrayList<ColorDefinition>();
 	
 	public static final String PARAMETER_PLAYER_NAME = "player_name";
 	public static final String PARAMETER_NUMBER_OF_PLAYERS = "number_of_players";
@@ -48,12 +48,12 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 	@Override
 	protected void onInitialize()
 	{
-		this.colorIndex.put(Color.BLUE, false);
-		this.colorIndex.put(Color.RED, false);
-		this.colorIndex.put(Color.GREEN, false);
-		this.colorIndex.put(Color.YELLOW, false);
-		this.colorIndex.put(Color.CYAN, false);
-		this.colorIndex.put(Color.MAGENTA, false);
+		this.colorIndex.add(new ColorDefinition(Color.argb(255, 60, 170, 230)));
+		this.colorIndex.add(new ColorDefinition(Color.argb(255, 255, 60, 60)));
+		this.colorIndex.add(new ColorDefinition(Color.argb(255, 100, 200, 100)));
+		this.colorIndex.add(new ColorDefinition(Color.argb(255, 255, 200, 40)));
+		this.colorIndex.add(new ColorDefinition(Color.argb(255, 230, 110, 240)));
+		this.colorIndex.add(new ColorDefinition(Color.argb(255, 130, 230, 230)));
 		
 		Button startGame = findViewById(R.id.start_game);
 		startGame.setOnClickListener(new OnClickListener()
@@ -174,13 +174,11 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 		
 		synchronized (this.colorLock)
 		{
-			for (int i = 0; i < this.colorIndex.size(); i++)
+			for (ColorDefinition colorDefinition : this.colorIndex)
 			{
-				int color = this.colorIndex.keyAt(i);
-				
-				if (!this.colorIndex.get(color))
+				if (!colorDefinition.acquired)
 				{
-					result = color;
+					result = colorDefinition.color;
 					break;
 				}
 			}
@@ -193,7 +191,14 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 	{
 		synchronized (this.colorLock)
 		{
-			this.colorIndex.put(color, false);
+			for (ColorDefinition colorDefinition : this.colorIndex)
+			{
+				if (colorDefinition.color == color)
+				{
+					colorDefinition.acquired = false;
+					break;
+				}
+			}
 		}
 	}
 	
@@ -203,10 +208,14 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 		
 		synchronized (this.colorLock)
 		{
-			if (!this.colorIndex.get(color))
+			for (ColorDefinition colorDefinition : this.colorIndex)
 			{
-				result = true;
-				this.colorIndex.put(color, true);
+				if ((colorDefinition.color == color) && (!colorDefinition.acquired))
+				{
+					result = true;
+					colorDefinition.acquired = true;
+					break;
+				}
 			}
 		}
 		

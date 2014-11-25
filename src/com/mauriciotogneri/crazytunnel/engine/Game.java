@@ -3,7 +3,6 @@ package com.mauriciotogneri.crazytunnel.engine;
 import java.util.List;
 import android.graphics.Color;
 import android.os.Vibrator;
-import android.util.Log;
 import android.util.SparseArray;
 import com.mauriciotogneri.crazytunnel.connection.MessageReader;
 import com.mauriciotogneri.crazytunnel.connection.Messages;
@@ -184,30 +183,19 @@ public class Game implements GameEvent
 	{
 		if (this.isServer)
 		{
-			Log.e("TEST2", "***************************");
 			Player player = getPlayerById(setPlayerBoxPosition.playerId);
 			
 			if (player != null)
 			{
 				this.gameConnection.send(player.macAddress, setPlayerBoxPosition.create(), false);
 			}
-			else
-			{
-				Log.e("TEST2", setPlayerBoxPosition.playerId + ": -------------------------------");
-			}
 		}
 		
-		Log.e("TEST2", "RECEIVING UPDATE BOX POSITION");
 		EnemyBox box = this.enemyBoxes.get(setPlayerBoxPosition.playerId);
 		
 		if (box != null)
 		{
-			Log.e("TEST2", "UPDATING BOX");
 			box.update(setPlayerBoxPosition.x, setPlayerBoxPosition.y);
-		}
-		else
-		{
-			Log.e("TEST2", "ERROR");
 		}
 	}
 	
