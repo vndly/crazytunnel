@@ -84,7 +84,7 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 		this.serverConnection.listen(LobbyServerScreen.UUID, numberOfPlayers, LobbyServerScreen.VISIBILITY_DURATION);
 		
 		TextView deviceAddress = (TextView)findViewById(R.id.device_address);
-		deviceAddress.setText(this.serverConnection.getDeviceName() + "\r\n" + this.serverConnection.getDeviceAddress());
+		deviceAddress.setText(this.serverConnection.getDeviceName() + " - " + this.serverConnection.getDeviceAddress());
 		
 		int freeColor = getFreeColor();
 		

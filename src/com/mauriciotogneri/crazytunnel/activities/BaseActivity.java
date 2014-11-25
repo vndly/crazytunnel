@@ -23,6 +23,7 @@ public abstract class BaseActivity extends FragmentActivity
 		Window window = getWindow();
 		window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 		
 		super.onCreate(savedInstanceState);
 		
