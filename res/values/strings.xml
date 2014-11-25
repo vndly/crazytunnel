@@ -8,4 +8,8 @@
     
     <string name="lobby_start_game">Start game</string>
 
+    <string name="game_selection_title">Select game</string>
+    
+    <string name="client_lobby_title">Game lobby</string>
+    
 </resources>

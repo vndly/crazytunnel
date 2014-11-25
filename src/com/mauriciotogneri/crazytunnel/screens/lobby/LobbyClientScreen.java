@@ -2,7 +2,9 @@ package com.mauriciotogneri.crazytunnel.screens.lobby;
 
 import java.util.ArrayList;
 import android.bluetooth.BluetoothDevice;
+import android.view.View;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import com.mauriciotogneri.bluetooth.connection.client.ClientConnection;
 import com.mauriciotogneri.bluetooth.connection.client.ClientEvent;
 import com.mauriciotogneri.crazytunnel.R;
@@ -111,6 +113,9 @@ public class LobbyClientScreen extends BaseFragment implements ClientEvent
 	
 	private void refreshPlayerList(Player[] players)
 	{
+		ProgressBar progressBar = findViewById(R.id.progressBar);
+		progressBar.setVisibility(View.GONE);
+		
 		this.playerAdapter.clear();
 		
 		for (Player player : players)

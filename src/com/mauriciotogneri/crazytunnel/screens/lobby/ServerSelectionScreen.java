@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import com.mauriciotogneri.bluetooth.connection.scan.DeviceScanner;
 import com.mauriciotogneri.bluetooth.connection.scan.ScannerManager;
 import com.mauriciotogneri.crazytunnel.R;
@@ -52,6 +53,9 @@ public class ServerSelectionScreen extends BaseFragment implements DeviceScanner
 	
 	private void addServer(BluetoothDevice device)
 	{
+		ProgressBar progressBar = findViewById(R.id.progressBar);
+		progressBar.setVisibility(View.GONE);
+		
 		this.serverAdapter.add(device);
 	}
 	
