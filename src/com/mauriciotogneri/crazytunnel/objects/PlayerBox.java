@@ -19,13 +19,15 @@ public class PlayerBox
 	
 	private float acceleration = 0;
 	
-	private static final float GRAVITY = 1 * 0.1f;
+	private static final float SLOW_RATIO = 1; // 0.1f;
+	
+	private static final float GRAVITY = 1 * PlayerBox.SLOW_RATIO;
 	private static final float JUMP_FORCE = 3;
 	
-	private static final float SPEED = 40 * 0.1f;
+	private static final float SPEED = 40 * PlayerBox.SLOW_RATIO;
 	
-	private static final float MAX_ACCELERATION_UP = 30 * 0.1f;
-	private static final float MAX_ACCELERATION_DOWN = 30 * 0.1f;
+	private static final float MAX_ACCELERATION_UP = 30 * PlayerBox.SLOW_RATIO;
+	private static final float MAX_ACCELERATION_DOWN = 30 * PlayerBox.SLOW_RATIO;
 	
 	private static final int SIZE = 5;
 	

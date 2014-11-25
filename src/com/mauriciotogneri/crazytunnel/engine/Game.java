@@ -1,7 +1,6 @@
 package com.mauriciotogneri.crazytunnel.engine;
 
 import java.util.List;
-import android.graphics.Color;
 import android.os.Vibrator;
 import android.util.SparseArray;
 import com.mauriciotogneri.crazytunnel.connection.MessageReader;
@@ -98,16 +97,7 @@ public class Game implements GameEvent
 	{
 		LevelDefinition result = new LevelDefinition(200, 3);
 		
-		int color = Color.argb(255, 90, 110, 120);
-		
-		Shape wall = new Rectangle(Renderer.RESOLUTION_X * 2, 5, color);
-		Sprite wallBottom = new Sprite(wall, 0, 0);
-		Sprite wallTop = new Sprite(wall, 0, Renderer.RESOLUTION_Y - 5);
-		
-		result.add(wallTop);
-		result.add(wallBottom);
-		
-		Shape obstacle = new Rectangle(5, 15, color);
+		Shape obstacle = new Rectangle(5, 15, LevelDefinition.WALL_COLOR);
 		
 		result.add(new Sprite(obstacle, 80, 5));
 		result.add(new Sprite(obstacle, 130, Renderer.RESOLUTION_Y - 20));
@@ -144,8 +134,9 @@ public class Game implements GameEvent
 				break;
 		}
 		
-		renderer.clearScreen(this.camera);
 		focusCamera(this.camera, this.playerBox);
+		renderer.clearScreen(this.camera);
+		
 		this.level.render(renderer);
 		
 		for (int i = 0, size = this.enemyBoxes.size(); i < size; i++)

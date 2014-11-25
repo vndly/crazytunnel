@@ -24,7 +24,7 @@ public class Level
 	{
 		boolean result = false;
 		
-		for (Sprite obstacle : this.levelDefinition.getSprites())
+		for (Sprite obstacle : this.levelDefinition.getCollisionableSprites())
 		{
 			if (obstacle.collide(sprite))
 			{
@@ -38,7 +38,15 @@ public class Level
 	
 	public void render(Renderer renderer)
 	{
-		for (Sprite sprite : this.levelDefinition.getSprites())
+		for (Sprite sprite : this.levelDefinition.getNonCollisionableSprites())
+		{
+			if (this.camera.isInside(sprite))
+			{
+				sprite.render(renderer);
+			}
+		}
+		
+		for (Sprite sprite : this.levelDefinition.getCollisionableSprites())
 		{
 			if (this.camera.isInside(sprite))
 			{
