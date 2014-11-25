@@ -12,6 +12,8 @@ public class LevelDefinition
 {
 	private final int length;
 	private final int laps;
+	
+	private final List<Sprite> base = new ArrayList<Sprite>();
 	private final List<Sprite> collisionableSprites = new ArrayList<Sprite>();
 	private final List<Sprite> nonCollisionableSprites = new ArrayList<Sprite>();
 	
@@ -34,7 +36,7 @@ public class LevelDefinition
 	
 	public void add(Sprite sprite)
 	{
-		this.collisionableSprites.add(sprite);
+		this.base.add(sprite);
 	}
 	
 	public List<Sprite> getCollisionableSprites()
@@ -54,24 +56,13 @@ public class LevelDefinition
 	
 	public void build()
 	{
-		List<Sprite> base = new ArrayList<Sprite>();
-		
-		for (Sprite sprite : this.collisionableSprites)
-		{
-			base.add(sprite);
-		}
-		
-		Shape initialStartLineShape = new Rectangle(1, Renderer.RESOLUTION_Y, Color.argb(255, 200, 200, 200));
-		Sprite initialStartLine = new Sprite(initialStartLineShape, 0, 0);
-		this.nonCollisionableSprites.add(initialStartLine);
-		
-		for (int i = 1; i < this.laps; i++)
+		for (int i = 0; i < this.laps; i++)
 		{
 			Shape startLineShape = new Rectangle(1, Renderer.RESOLUTION_Y, Color.argb(255, 200, 200, 200));
 			Sprite startLine = new Sprite(startLineShape, this.length * i, 0);
 			this.nonCollisionableSprites.add(startLine);
 			
-			for (Sprite sprite : base)
+			for (Sprite sprite : this.base)
 			{
 				this.collisionableSprites.add(sprite.copyAt(sprite.x + (this.length * i), sprite.y));
 			}
