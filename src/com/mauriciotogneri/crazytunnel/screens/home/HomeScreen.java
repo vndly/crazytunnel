@@ -1,4 +1,4 @@
-package com.mauriciotogneri.crazytunnel.screens;
+package com.mauriciotogneri.crazytunnel.screens.home;
 
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -48,29 +48,47 @@ public class HomeScreen extends BaseFragment
 	private void createMatch()
 	{
 		String playerName = getPlayerName();
-		int numberOfPlayers = getNumberOfPlayers();
 		
-		LobbyServerScreen lobbyServer = new LobbyServerScreen();
-		lobbyServer.setParameter(LobbyServerScreen.PARAMETER_PLAYER_NAME, playerName);
-		lobbyServer.setParameter(LobbyServerScreen.PARAMETER_NUMBER_OF_PLAYERS, numberOfPlayers);
-		openFragment(lobbyServer);
+		if (playerName.isEmpty())
+		{
+			showToast("MISSING NAME");
+		}
+		else
+		{
+			Preferences.setPlayerName(playerName);
+			
+			int numberOfPlayers = getNumberOfPlayers();
+			
+			LobbyServerScreen lobbyServer = new LobbyServerScreen();
+			lobbyServer.setParameter(LobbyServerScreen.PARAMETER_PLAYER_NAME, playerName);
+			lobbyServer.setParameter(LobbyServerScreen.PARAMETER_NUMBER_OF_PLAYERS, numberOfPlayers);
+			openFragment(lobbyServer);
+		}
 	}
 	
 	private void joinMatch()
 	{
 		String playerName = getPlayerName();
 		
-		ServerSelectionScreen serverSelection = new ServerSelectionScreen();
-		serverSelection.setParameter(ServerSelectionScreen.PARAMETER_PLAYER_NAME, playerName);
-		openFragment(serverSelection);
+		if (playerName.isEmpty())
+		{
+			showToast("MISSING NAME");
+		}
+		else
+		{
+			Preferences.setPlayerName(playerName);
+			
+			ServerSelectionScreen serverSelection = new ServerSelectionScreen();
+			serverSelection.setParameter(ServerSelectionScreen.PARAMETER_PLAYER_NAME, playerName);
+			openFragment(serverSelection);
+			
+		}
 	}
 	
 	private String getPlayerName()
 	{
 		EditText playerName = findViewById(R.id.player_name);
 		String result = playerName.getText().toString();
-		
-		Preferences.setPlayerName(result);
 		
 		return result;
 	}

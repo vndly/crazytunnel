@@ -1,7 +1,7 @@
 package com.mauriciotogneri.crazytunnel.activities;
 
 import com.mauriciotogneri.crazytunnel.R;
-import com.mauriciotogneri.crazytunnel.screens.HomeScreen;
+import com.mauriciotogneri.crazytunnel.screens.home.HomeScreen;
 import com.mauriciotogneri.crazytunnel.shapes.Preferences;
 
 public class MainActivity extends BaseActivity
