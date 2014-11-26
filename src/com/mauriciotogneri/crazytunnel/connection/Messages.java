@@ -3,7 +3,7 @@ package com.mauriciotogneri.crazytunnel.connection;
 import java.util.ArrayList;
 import java.util.List;
 import com.mauriciotogneri.crazytunnel.objects.Player;
-import com.mauriciotogneri.crazytunnel.objects.PlayerBox;
+import com.mauriciotogneri.crazytunnel.objects.box.PlayerBox;
 
 public class Messages
 {

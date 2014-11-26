@@ -1,4 +1,4 @@
-package com.mauriciotogneri.crazytunnel.objects;
+package com.mauriciotogneri.crazytunnel.objects.level;
 
 import java.util.ArrayList;
 import java.util.List;

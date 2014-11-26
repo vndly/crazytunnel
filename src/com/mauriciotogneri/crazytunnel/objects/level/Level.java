@@ -1,4 +1,4 @@
-package com.mauriciotogneri.crazytunnel.objects;
+package com.mauriciotogneri.crazytunnel.objects.level;
 
 import com.mauriciotogneri.crazytunnel.engine.Camera;
 import com.mauriciotogneri.crazytunnel.engine.Renderer;
