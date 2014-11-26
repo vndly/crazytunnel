@@ -12,10 +12,13 @@ public class Box
 	private final Camera camera;
 	private final Level level;
 	
+	private final float initialX;
+	private final float initialY;
+	
 	protected final Sprite sprite;
 	protected float acceleration = 0;
 	
-	private static final float SLOW_RATIO = 0.2f; // 0.1f;
+	private static final float SLOW_RATIO = 1f; // 0.2f;
 	
 	private static final float GRAVITY = 1 * Box.SLOW_RATIO;
 	protected static final float JUMP_FORCE = 3;
@@ -32,8 +35,17 @@ public class Box
 		this.camera = camera;
 		this.level = level;
 		
+		this.initialX = x;
+		this.initialY = y;
+		
 		Shape square = new Square(Box.SIZE, color);
 		this.sprite = new Sprite(square, x, y);
+	}
+	
+	public void restart()
+	{
+		this.sprite.x = this.initialX;
+		this.sprite.y = this.initialY;
 	}
 	
 	protected void updatePosition(float delta)

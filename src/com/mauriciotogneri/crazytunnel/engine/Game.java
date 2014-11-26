@@ -38,6 +38,7 @@ public class Game implements GameEvent
 	private Level level;
 	
 	private final Alarm alarmCountdown;
+	private final Alarm alarmFinished;
 	
 	private GameStatus gameStatus = GameStatus.READY;
 	
@@ -45,7 +46,8 @@ public class Game implements GameEvent
 	{
 		READY, // all the players in the starting line
 		COUNTDOWN, // the countdown is decreasing
-		RUNNING; // the race is on
+		RUNNING, // the race is on
+		FINISHED; // the race is finished
 	}
 	
 	public Game(GameScreen gameScreen, GameConnection gameConnection, Player player, List<Player> enemyPlayers, boolean isServer)
@@ -69,6 +71,17 @@ public class Game implements GameEvent
 				return false;
 			}
 		}, 3 * 1000);
+		
+		this.alarmFinished = new Alarm(new OnAlarmRing()
+		{
+			@Override
+			public boolean onAlarmRing()
+			{
+				leaderboardFinished();
+				
+				return false;
+			}
+		}, 3 * 1000);
 	}
 	
 	public void start(Renderer renderer)
@@ -88,8 +101,17 @@ public class Game implements GameEvent
 				EnemyBox box = new EnemyBox(this.camera, this.level, 0, Renderer.RESOLUTION_Y / 2, player.color);
 				this.enemyBoxes.put(player.id, box);
 			}
-			
-			restart();
+		}
+	}
+	
+	private void restart()
+	{
+		this.playerBox.restart();
+		
+		for (int i = 0, size = this.enemyBoxes.size(); i < size; i++)
+		{
+			EnemyBox box = this.enemyBoxes.valueAt(i);
+			box.restart();
 		}
 	}
 	
@@ -107,52 +129,96 @@ public class Game implements GameEvent
 		return result;
 	}
 	
-	private void restart()
-	{
-	}
-	
 	// ======================== UPDATE ====================== \\
 	
 	private boolean lastInput = false;
 	
 	public void update(float delta, InputEvent input, Renderer renderer)
 	{
-		this.alarmCountdown.step(delta);
-		
 		switch (this.gameStatus)
 		{
 			case RUNNING:
-				this.playerBox.update(delta, input);
-				broadcastBoxPosition(this.player, this.playerBox, input);
-				for (int i = 0, size = this.enemyBoxes.size(); i < size; i++)
-				{
-					EnemyBox box = this.enemyBoxes.valueAt(i);
-					box.update(delta);
-				}
+				processRunning(delta, input);
 				break;
-			case COUNTDOWN:
-				break;
+			
 			case READY:
-				if (this.isServer)
-				{
-					this.gameStatus = GameStatus.COUNTDOWN;
-					this.alarmCountdown.restart();
-				}
+				processReady();
+				break;
+			
+			case COUNTDOWN:
+				this.alarmCountdown.step(delta);
+				break;
+			
+			case FINISHED:
+				this.alarmFinished.step(delta);
 				break;
 		}
 		
-		focusCamera(this.camera, this.playerBox);
-		renderer.clearScreen(this.camera);
+		render(renderer, this.camera, this.level, this.playerBox, this.enemyBoxes);
+	}
+	
+	private void processReady()
+	{
+		restart();
 		
-		this.level.render(renderer);
+		if (this.isServer)
+		{
+			this.gameStatus = GameStatus.COUNTDOWN;
+			this.alarmCountdown.restart();
+		}
+	}
+	
+	private void processRunning(float delta, InputEvent input)
+	{
+		this.playerBox.update(delta, input);
+		broadcastBoxPosition(this.player, this.playerBox, input);
 		
 		for (int i = 0, size = this.enemyBoxes.size(); i < size; i++)
 		{
 			EnemyBox box = this.enemyBoxes.valueAt(i);
+			box.update(delta);
+		}
+		
+		if (this.isServer && this.playerBox.finished() && enemiesFinished(this.enemyBoxes))
+		{
+			this.gameStatus = GameStatus.FINISHED;
+			
+			this.alarmFinished.restart();
+		}
+	}
+	
+	private boolean enemiesFinished(SparseArray<EnemyBox> enemyBoxes)
+	{
+		boolean result = true;
+		
+		for (int i = 0, size = enemyBoxes.size(); i < size; i++)
+		{
+			EnemyBox box = enemyBoxes.valueAt(i);
+			
+			if (!box.finished())
+			{
+				result = false;
+				break;
+			}
+		}
+		
+		return result;
+	}
+	
+	private void render(Renderer renderer, Camera camera, Level level, PlayerBox playerBox, SparseArray<EnemyBox> enemyBoxes)
+	{
+		focusCamera(camera, playerBox);
+		renderer.clearScreen(camera);
+		
+		level.render(renderer);
+		
+		for (int i = 0, size = enemyBoxes.size(); i < size; i++)
+		{
+			EnemyBox box = enemyBoxes.valueAt(i);
 			box.render(renderer);
 		}
 		
-		this.playerBox.render(renderer);
+		playerBox.render(renderer);
 	}
 	
 	private void broadcastBoxPosition(Player player, PlayerBox box, InputEvent input)
@@ -175,6 +241,18 @@ public class Game implements GameEvent
 		this.gameConnection.send(Messages.StartRace.create(), true);
 		
 		startRace();
+	}
+	
+	private void leaderboardFinished()
+	{
+		this.gameConnection.send(Messages.RestartRace.create(), true);
+		
+		restartRace();
+	}
+	
+	private void restartRace()
+	{
+		this.gameStatus = GameStatus.READY;
 	}
 	
 	private void startRace()
@@ -257,6 +335,10 @@ public class Game implements GameEvent
 			{
 				case Messages.StartRace.CODE:
 					startRace();
+					break;
+				
+				case Messages.RestartRace.CODE:
+					restartRace();
 					break;
 				
 				case Messages.SetPlayerBoxPosition.CODE:

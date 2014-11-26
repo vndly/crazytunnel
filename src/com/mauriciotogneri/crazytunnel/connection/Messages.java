@@ -152,6 +152,23 @@ public class Messages
 		}
 	}
 	
+	public static class RestartRace
+	{
+		public static final byte CODE = 6;
+		
+		public RestartRace()
+		{
+		}
+		
+		public static byte[] create()
+		{
+			MessageWriter writer = new MessageWriter();
+			writer.putByte(RestartRace.CODE);
+			
+			return writer.getMessage();
+		}
+	}
+	
 	public static class SetPlayerBoxPosition
 	{
 		public final byte playerId;
@@ -159,7 +176,7 @@ public class Messages
 		public final float x;
 		public final float y;
 		
-		public static final byte CODE = 6;
+		public static final byte CODE = 7;
 		
 		public SetPlayerBoxPosition(MessageReader reader)
 		{
