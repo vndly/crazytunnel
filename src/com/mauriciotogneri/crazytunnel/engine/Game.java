@@ -85,7 +85,7 @@ public class Game implements GameEvent
 			
 			for (Player player : this.enemyPlayers)
 			{
-				EnemyBox box = new EnemyBox(0, Renderer.RESOLUTION_Y / 2, player.color);
+				EnemyBox box = new EnemyBox(this.camera, this.level, 0, Renderer.RESOLUTION_Y / 2, player.color);
 				this.enemyBoxes.put(player.id, box);
 			}
 			
@@ -113,6 +113,8 @@ public class Game implements GameEvent
 	
 	// ======================== UPDATE ====================== \\
 	
+	private boolean lastInput = false;
+	
 	public void update(float delta, InputEvent input, Renderer renderer)
 	{
 		this.alarmCountdown.step(delta);
@@ -121,7 +123,12 @@ public class Game implements GameEvent
 		{
 			case RUNNING:
 				this.playerBox.update(delta, input);
-				broadcastBoxPosition(this.player, this.playerBox);
+				broadcastBoxPosition(this.player, this.playerBox, input);
+				for (int i = 0, size = this.enemyBoxes.size(); i < size; i++)
+				{
+					EnemyBox box = this.enemyBoxes.valueAt(i);
+					box.update(delta);
+				}
 				break;
 			case COUNTDOWN:
 				break;
@@ -148,9 +155,14 @@ public class Game implements GameEvent
 		this.playerBox.render(renderer);
 	}
 	
-	private void broadcastBoxPosition(Player player, PlayerBox box)
+	private void broadcastBoxPosition(Player player, PlayerBox box, InputEvent input)
 	{
-		this.gameConnection.send(Messages.SetPlayerBoxPosition.create(player, box), false);
+		if (this.lastInput != input.jump)
+		{
+			this.lastInput = input.jump;
+			
+			this.gameConnection.send(Messages.SetPlayerBoxPosition.create(player, box, input.jump), true);
+		}
 	}
 	
 	private void focusCamera(Camera camera, PlayerBox playerBox)
@@ -186,7 +198,7 @@ public class Game implements GameEvent
 		
 		if (box != null)
 		{
-			box.update(setPlayerBoxPosition.x, setPlayerBoxPosition.y);
+			box.update(setPlayerBoxPosition.x, setPlayerBoxPosition.y, setPlayerBoxPosition.jumping);
 		}
 	}
 	

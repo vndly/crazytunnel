@@ -15,6 +15,19 @@ public class MessageReader
 		this.dataStream = new DataInputStream(this.byteArray);
 	}
 	
+	public boolean getBoolean()
+	{
+		try
+		{
+			return this.dataStream.readBoolean();
+		}
+		catch (IOException e)
+		{
+		}
+		
+		return false;
+	}
+	
 	public byte getByte()
 	{
 		try

@@ -19,7 +19,7 @@ public class PlayerBox
 	
 	private float acceleration = 0;
 	
-	private static final float SLOW_RATIO = 1; // 0.1f;
+	private static final float SLOW_RATIO = 0.2f; // 0.1f;
 	
 	private static final float GRAVITY = 1 * PlayerBox.SLOW_RATIO;
 	private static final float JUMP_FORCE = 3;

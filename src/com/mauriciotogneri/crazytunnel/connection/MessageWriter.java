@@ -15,6 +15,17 @@ public class MessageWriter
 		this.dataStream = new DataOutputStream(this.byteArray);
 	}
 	
+	public void putBoolean(boolean value)
+	{
+		try
+		{
+			this.dataStream.writeBoolean(value);
+		}
+		catch (IOException e)
+		{
+		}
+	}
+	
 	public void putByte(byte value)
 	{
 		try
