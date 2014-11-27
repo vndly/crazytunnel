@@ -4,6 +4,7 @@ import java.util.List;
 import android.content.Context;
 import android.os.Vibrator;
 import android.util.SparseArray;
+import com.mauriciotogneri.crazytunnel.R;
 import com.mauriciotogneri.crazytunnel.connection.MessageReader;
 import com.mauriciotogneri.crazytunnel.connection.Messages;
 import com.mauriciotogneri.crazytunnel.connection.Messages.SetPlayerBoxPosition;
@@ -61,7 +62,7 @@ public class Game implements GameEvent
 		this.camera = new Camera(Renderer.RESOLUTION_X, Renderer.RESOLUTION_Y);
 		
 		Vibrator vibrator = this.gameScreen.getVibrator();
-		LevelDefinition levelDefinition = getLevelDefinition(gameScreen.getContext(), laps);
+		LevelDefinition levelDefinition = getLevelDefinition(gameScreen.getContext(), R.raw.map, laps);
 		
 		this.level = new Level(this.camera, levelDefinition);
 		
@@ -115,47 +116,9 @@ public class Game implements GameEvent
 		}
 	}
 	
-	private LevelDefinition getLevelDefinition(Context context, int laps)
+	private LevelDefinition getLevelDefinition(Context context, int mapId, int laps)
 	{
-		LevelDefinition result = new LevelDefinition(context, 250, laps);
-		
-		// Shape singleSquare = new Rectangle(LevelDefinition.BLOCK_SIZE, LevelDefinition.BLOCK_SIZE,
-		// LevelDefinition.WALL_COLOR);
-		//
-		// Shape horizontal2 = new Rectangle(LevelDefinition.BLOCK_SIZE * 2, LevelDefinition.BLOCK_SIZE,
-		// LevelDefinition.WALL_COLOR);
-		// Shape horizontal3 = new Rectangle(LevelDefinition.BLOCK_SIZE * 3, LevelDefinition.BLOCK_SIZE,
-		// LevelDefinition.WALL_COLOR);
-		//
-		// Shape vertical3 = new Rectangle(LevelDefinition.BLOCK_SIZE, LevelDefinition.BLOCK_SIZE * 3,
-		// LevelDefinition.WALL_COLOR);
-		// Shape vertical6 = new Rectangle(LevelDefinition.BLOCK_SIZE, LevelDefinition.BLOCK_SIZE * 6,
-		// LevelDefinition.WALL_COLOR);
-		//
-		// result.add(new Sprite(singleSquare, 70, 10));
-		// result.add(new Sprite(singleSquare, 70, 25));
-		// result.add(new Sprite(singleSquare, 70, 40));
-		//
-		// result.add(new Sprite(singleSquare, 90, 5));
-		// result.add(new Sprite(singleSquare, 90, 20));
-		// result.add(new Sprite(singleSquare, 90, 35));
-		// result.add(new Sprite(singleSquare, 90, 50));
-		//
-		// result.add(new Sprite(horizontal2, 110, 45));
-		// result.add(new Sprite(horizontal2, 120, 40));
-		//
-		// result.add(new Sprite(horizontal2, 110, 10));
-		// result.add(new Sprite(horizontal2, 120, 15));
-		// result.add(new Sprite(horizontal2, 130, 20));
-		// result.add(new Sprite(horizontal2, 140, 25));
-		//
-		// result.add(new Sprite(horizontal3, 145, 5));
-		//
-		// result.add(new Sprite(vertical6, 170, 25));
-		// result.add(new Sprite(vertical6, 195, 5));
-		//
-		// result.add(new Sprite(vertical3, 215, 30));
-		
+		LevelDefinition result = new LevelDefinition(context, mapId, laps);
 		result.build();
 		
 		return result;

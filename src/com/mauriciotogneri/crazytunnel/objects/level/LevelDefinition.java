@@ -5,14 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import android.content.Context;
 import android.graphics.Color;
-import com.mauriciotogneri.crazytunnel.R;
 import com.mauriciotogneri.crazytunnel.engine.Renderer;
 import com.mauriciotogneri.crazytunnel.engine.Sprite;
 import com.mauriciotogneri.crazytunnel.shapes.Rectangle;
@@ -34,10 +32,12 @@ public class LevelDefinition
 	
 	public static final int BLOCK_SIZE = 5;
 	
-	public LevelDefinition(Context context, int length, int laps)
+	public LevelDefinition(Context context, int mapId, int laps)
 	{
-		this.length = length;
+		Node root = getRoot(FileUtils.getInputStream(context, mapId));
+		
 		this.laps = laps;
+		this.length = getLength(root);
 		
 		Shape wall = new Rectangle(Renderer.RESOLUTION_X * (laps + 2), LevelDefinition.WALL_HEIGHT, LevelDefinition.WALL_COLOR);
 		Sprite wallBottom = new Sprite(wall, -Renderer.RESOLUTION_X, 0);
@@ -46,14 +46,18 @@ public class LevelDefinition
 		add(wallTop);
 		add(wallBottom);
 		
-		readMap(context, R.raw.map);
+		readMap(root);
 	}
 	
-	private void readMap(Context context, int mapId)
+	private int getLength(Node root)
 	{
-		Document document = getDocument(FileUtils.getInputStream(context, mapId));
+		Element element = (Element)root;
 		
-		Node root = document.getFirstChild();
+		return Integer.parseInt(element.getAttribute("width"));
+	}
+	
+	private void readMap(Node root)
+	{
 		NodeList nodes = root.getChildNodes();
 		
 		for (int i = 0; i < nodes.getLength(); i++)
@@ -103,16 +107,16 @@ public class LevelDefinition
 		}
 	}
 	
-	private Document getDocument(InputStream inputStream)
+	private Node getRoot(InputStream inputStream)
 	{
-		Document result = null;
+		Node result = null;
 		
 		try
 		{
 			DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
 			InputSource inputSource = new InputSource(inputStream);
-			result = documentBuilder.parse(inputSource);
+			result = documentBuilder.parse(inputSource).getFirstChild();
 		}
 		catch (Exception e)
 		{
