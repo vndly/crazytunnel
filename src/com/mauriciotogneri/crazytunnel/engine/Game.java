@@ -1,6 +1,7 @@
 package com.mauriciotogneri.crazytunnel.engine;
 
 import java.util.List;
+import android.content.Context;
 import android.os.Vibrator;
 import android.util.SparseArray;
 import com.mauriciotogneri.crazytunnel.connection.MessageReader;
@@ -16,8 +17,6 @@ import com.mauriciotogneri.crazytunnel.objects.level.LevelDefinition;
 import com.mauriciotogneri.crazytunnel.screens.game.GameConnection;
 import com.mauriciotogneri.crazytunnel.screens.game.GameEvent;
 import com.mauriciotogneri.crazytunnel.screens.game.GameScreen;
-import com.mauriciotogneri.crazytunnel.shapes.Rectangle;
-import com.mauriciotogneri.crazytunnel.shapes.Shape;
 
 public class Game implements GameEvent
 {
@@ -62,7 +61,7 @@ public class Game implements GameEvent
 		this.camera = new Camera(Renderer.RESOLUTION_X, Renderer.RESOLUTION_Y);
 		
 		Vibrator vibrator = this.gameScreen.getVibrator();
-		LevelDefinition levelDefinition = getLevelDefinition(laps);
+		LevelDefinition levelDefinition = getLevelDefinition(gameScreen.getContext(), laps);
 		
 		this.level = new Level(this.camera, levelDefinition);
 		
@@ -116,41 +115,46 @@ public class Game implements GameEvent
 		}
 	}
 	
-	private LevelDefinition getLevelDefinition(int laps)
+	private LevelDefinition getLevelDefinition(Context context, int laps)
 	{
-		LevelDefinition result = new LevelDefinition(250, laps);
+		LevelDefinition result = new LevelDefinition(context, 250, laps);
 		
-		Shape singleSquare = new Rectangle(LevelDefinition.BLOCK_SIZE, LevelDefinition.BLOCK_SIZE, LevelDefinition.WALL_COLOR);
-		
-		Shape horizontal2 = new Rectangle(LevelDefinition.BLOCK_SIZE * 2, LevelDefinition.BLOCK_SIZE, LevelDefinition.WALL_COLOR);
-		Shape horizontal3 = new Rectangle(LevelDefinition.BLOCK_SIZE * 3, LevelDefinition.BLOCK_SIZE, LevelDefinition.WALL_COLOR);
-		
-		Shape vertical3 = new Rectangle(LevelDefinition.BLOCK_SIZE, LevelDefinition.BLOCK_SIZE * 3, LevelDefinition.WALL_COLOR);
-		Shape vertical6 = new Rectangle(LevelDefinition.BLOCK_SIZE, LevelDefinition.BLOCK_SIZE * 6, LevelDefinition.WALL_COLOR);
-		
-		result.add(new Sprite(singleSquare, 70, 10));
-		result.add(new Sprite(singleSquare, 70, 25));
-		result.add(new Sprite(singleSquare, 70, 40));
-		
-		result.add(new Sprite(singleSquare, 90, 5));
-		result.add(new Sprite(singleSquare, 90, 20));
-		result.add(new Sprite(singleSquare, 90, 35));
-		result.add(new Sprite(singleSquare, 90, 50));
-		
-		result.add(new Sprite(horizontal2, 110, 45));
-		result.add(new Sprite(horizontal2, 120, 40));
-		
-		result.add(new Sprite(horizontal2, 110, 10));
-		result.add(new Sprite(horizontal2, 120, 15));
-		result.add(new Sprite(horizontal2, 130, 20));
-		result.add(new Sprite(horizontal2, 140, 25));
-		
-		result.add(new Sprite(horizontal3, 145, 5));
-		
-		result.add(new Sprite(vertical6, 170, 25));
-		result.add(new Sprite(vertical6, 195, 5));
-		
-		result.add(new Sprite(vertical3, 215, 30));
+		// Shape singleSquare = new Rectangle(LevelDefinition.BLOCK_SIZE, LevelDefinition.BLOCK_SIZE,
+		// LevelDefinition.WALL_COLOR);
+		//
+		// Shape horizontal2 = new Rectangle(LevelDefinition.BLOCK_SIZE * 2, LevelDefinition.BLOCK_SIZE,
+		// LevelDefinition.WALL_COLOR);
+		// Shape horizontal3 = new Rectangle(LevelDefinition.BLOCK_SIZE * 3, LevelDefinition.BLOCK_SIZE,
+		// LevelDefinition.WALL_COLOR);
+		//
+		// Shape vertical3 = new Rectangle(LevelDefinition.BLOCK_SIZE, LevelDefinition.BLOCK_SIZE * 3,
+		// LevelDefinition.WALL_COLOR);
+		// Shape vertical6 = new Rectangle(LevelDefinition.BLOCK_SIZE, LevelDefinition.BLOCK_SIZE * 6,
+		// LevelDefinition.WALL_COLOR);
+		//
+		// result.add(new Sprite(singleSquare, 70, 10));
+		// result.add(new Sprite(singleSquare, 70, 25));
+		// result.add(new Sprite(singleSquare, 70, 40));
+		//
+		// result.add(new Sprite(singleSquare, 90, 5));
+		// result.add(new Sprite(singleSquare, 90, 20));
+		// result.add(new Sprite(singleSquare, 90, 35));
+		// result.add(new Sprite(singleSquare, 90, 50));
+		//
+		// result.add(new Sprite(horizontal2, 110, 45));
+		// result.add(new Sprite(horizontal2, 120, 40));
+		//
+		// result.add(new Sprite(horizontal2, 110, 10));
+		// result.add(new Sprite(horizontal2, 120, 15));
+		// result.add(new Sprite(horizontal2, 130, 20));
+		// result.add(new Sprite(horizontal2, 140, 25));
+		//
+		// result.add(new Sprite(horizontal3, 145, 5));
+		//
+		// result.add(new Sprite(vertical6, 170, 25));
+		// result.add(new Sprite(vertical6, 195, 5));
+		//
+		// result.add(new Sprite(vertical3, 215, 30));
 		
 		result.build();
 		

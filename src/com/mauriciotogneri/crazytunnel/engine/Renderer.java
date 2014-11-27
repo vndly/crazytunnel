@@ -1,9 +1,5 @@
 package com.mauriciotogneri.crazytunnel.engine;
 
-import java.io.BufferedReader;
-import java.io.Closeable;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.FloatBuffer;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -15,6 +11,7 @@ import android.opengl.Matrix;
 import com.mauriciotogneri.crazytunnel.R;
 import com.mauriciotogneri.crazytunnel.input.InputEvent;
 import com.mauriciotogneri.crazytunnel.input.InputManager;
+import com.mauriciotogneri.crazytunnel.util.FileUtils;
 import com.mauriciotogneri.crazytunnel.util.ShaderUtils;
 
 public class Renderer implements android.opengl.GLSurfaceView.Renderer
@@ -173,8 +170,8 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer
 		
 		GLES20.glClearColor(0.9f, 0.9f, 0.9f, 1f);
 		
-		String vertexShaderSource = readTextFile(this.context, R.raw.vertex_shader);
-		String fragmentShaderSource = readTextFile(this.context, R.raw.fragment_shader);
+		String vertexShaderSource = FileUtils.readTextFile(this.context, R.raw.vertex_shader);
+		String fragmentShaderSource = FileUtils.readTextFile(this.context, R.raw.fragment_shader);
 		
 		int program = ShaderUtils.linkProgram(vertexShaderSource, fragmentShaderSource);
 		GLES20.glUseProgram(program);
@@ -229,57 +226,6 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer
 					{
 					}
 				}
-			}
-		}
-	}
-	
-	private String readTextFile(Context context, int resourceId)
-	{
-		StringBuilder builder = new StringBuilder();
-		
-		InputStream inputStream = null;
-		InputStreamReader inputStreamReader = null;
-		BufferedReader bufferedReader = null;
-		
-		try
-		{
-			inputStream = context.getResources().openRawResource(resourceId);
-			inputStreamReader = new InputStreamReader(inputStream);
-			bufferedReader = new BufferedReader(inputStreamReader);
-			
-			String nextLine;
-			
-			while ((nextLine = bufferedReader.readLine()) != null)
-			{
-				builder.append(nextLine);
-				builder.append('\n');
-			}
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			closeResource(inputStream);
-			closeResource(inputStreamReader);
-			closeResource(bufferedReader);
-		}
-		
-		return builder.toString();
-	}
-	
-	private void closeResource(Closeable resource)
-	{
-		if (resource != null)
-		{
-			try
-			{
-				resource.close();
-			}
-			catch (Exception e)
-			{
-				e.printStackTrace();
 			}
 		}
 	}
