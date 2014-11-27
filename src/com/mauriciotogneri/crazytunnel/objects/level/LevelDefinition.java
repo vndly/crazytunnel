@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -116,7 +117,20 @@ public class LevelDefinition
 			DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
 			InputSource inputSource = new InputSource(inputStream);
-			result = documentBuilder.parse(inputSource).getFirstChild();
+			Document document = documentBuilder.parse(inputSource);
+			
+			NodeList nodes = document.getChildNodes();
+			
+			for (int i = 0; i < nodes.getLength(); i++)
+			{
+				Node node = nodes.item(i);
+				
+				if (node.getNodeType() == Node.ELEMENT_NODE)
+				{
+					result = node;
+					break;
+				}
+			}
 		}
 		catch (Exception e)
 		{
