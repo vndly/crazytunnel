@@ -263,7 +263,7 @@ public class Game implements GameEvent
 			
 			if (player != null)
 			{
-				this.gameConnection.send(player.macAddress, setPlayerBoxPosition.create(), false);
+				this.gameConnection.send(player.macAddress, setPlayerBoxPosition.create(), true);
 			}
 		}
 		

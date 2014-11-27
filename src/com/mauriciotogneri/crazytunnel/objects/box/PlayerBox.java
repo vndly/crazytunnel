@@ -45,6 +45,14 @@ public class PlayerBox extends Box
 		}
 	}
 	
+	@Override
+	public void restart()
+	{
+		super.restart();
+		
+		pause();
+	}
+	
 	public void pause()
 	{
 		this.vibrating = false;

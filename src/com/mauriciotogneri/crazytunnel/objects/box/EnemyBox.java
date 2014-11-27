@@ -25,6 +25,14 @@ public class EnemyBox extends Box
 		}
 	}
 	
+	@Override
+	public void restart()
+	{
+		super.restart();
+		
+		this.jumping = false;
+	}
+	
 	public void update(float x, float y, boolean jumping)
 	{
 		this.sprite.x = x;
