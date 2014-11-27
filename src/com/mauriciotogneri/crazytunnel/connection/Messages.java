@@ -194,6 +194,7 @@ public class Messages
 			MessageWriter writer = new MessageWriter();
 			writer.putByte(SetPlayerBoxPosition.CODE);
 			writer.putByte(this.playerId);
+			writer.putBoolean(this.jumping);
 			writer.putFloat(this.x);
 			writer.putFloat(this.y);
 			
