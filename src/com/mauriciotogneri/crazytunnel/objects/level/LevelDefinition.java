@@ -21,6 +21,8 @@ public class LevelDefinition
 	
 	private static final int WALL_HEIGHT = 5;
 	
+	public static final int BLOCK_SIZE = 5;
+	
 	public LevelDefinition(int length, int laps)
 	{
 		this.length = length;

@@ -118,12 +118,39 @@ public class Game implements GameEvent
 	
 	private LevelDefinition getLevelDefinition(int laps)
 	{
-		LevelDefinition result = new LevelDefinition(200, laps);
+		LevelDefinition result = new LevelDefinition(250, laps);
 		
-		Shape obstacle = new Rectangle(5, 15, LevelDefinition.WALL_COLOR);
+		Shape singleSquare = new Rectangle(LevelDefinition.BLOCK_SIZE, LevelDefinition.BLOCK_SIZE, LevelDefinition.WALL_COLOR);
 		
-		result.add(new Sprite(obstacle, 80, 5));
-		result.add(new Sprite(obstacle, 130, Renderer.RESOLUTION_Y - 20));
+		Shape horizontal2 = new Rectangle(LevelDefinition.BLOCK_SIZE * 2, LevelDefinition.BLOCK_SIZE, LevelDefinition.WALL_COLOR);
+		Shape horizontal3 = new Rectangle(LevelDefinition.BLOCK_SIZE * 3, LevelDefinition.BLOCK_SIZE, LevelDefinition.WALL_COLOR);
+		
+		Shape vertical3 = new Rectangle(LevelDefinition.BLOCK_SIZE, LevelDefinition.BLOCK_SIZE * 3, LevelDefinition.WALL_COLOR);
+		Shape vertical6 = new Rectangle(LevelDefinition.BLOCK_SIZE, LevelDefinition.BLOCK_SIZE * 6, LevelDefinition.WALL_COLOR);
+		
+		result.add(new Sprite(singleSquare, 70, 10));
+		result.add(new Sprite(singleSquare, 70, 25));
+		result.add(new Sprite(singleSquare, 70, 40));
+		
+		result.add(new Sprite(singleSquare, 90, 5));
+		result.add(new Sprite(singleSquare, 90, 20));
+		result.add(new Sprite(singleSquare, 90, 35));
+		result.add(new Sprite(singleSquare, 90, 50));
+		
+		result.add(new Sprite(horizontal2, 110, 45));
+		result.add(new Sprite(horizontal2, 120, 40));
+		
+		result.add(new Sprite(horizontal2, 110, 10));
+		result.add(new Sprite(horizontal2, 120, 15));
+		result.add(new Sprite(horizontal2, 130, 20));
+		result.add(new Sprite(horizontal2, 140, 25));
+		
+		result.add(new Sprite(horizontal3, 145, 5));
+		
+		result.add(new Sprite(vertical6, 170, 25));
+		result.add(new Sprite(vertical6, 195, 5));
+		
+		result.add(new Sprite(vertical3, 215, 30));
 		
 		result.build();
 		

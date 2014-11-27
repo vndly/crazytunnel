@@ -23,7 +23,7 @@ public class Box
 	private static final float GRAVITY = 1 * Box.SLOW_RATIO;
 	protected static final float JUMP_FORCE = 3;
 	
-	private static final float SPEED = 40 * Box.SLOW_RATIO;
+	private static final float SPEED = 30 * Box.SLOW_RATIO;
 	
 	private static final float MAX_ACCELERATION_UP = 30 * Box.SLOW_RATIO;
 	private static final float MAX_ACCELERATION_DOWN = 30 * Box.SLOW_RATIO;
