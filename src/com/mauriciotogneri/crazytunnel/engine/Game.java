@@ -50,7 +50,7 @@ public class Game implements GameEvent
 		FINISHED; // the race is finished
 	}
 	
-	public Game(GameScreen gameScreen, GameConnection gameConnection, Player player, List<Player> enemyPlayers, boolean isServer)
+	public Game(GameScreen gameScreen, GameConnection gameConnection, Player player, List<Player> enemyPlayers, int laps, boolean isServer)
 	{
 		this.gameScreen = gameScreen;
 		this.gameConnection = gameConnection;
@@ -60,6 +60,19 @@ public class Game implements GameEvent
 		
 		this.isServer = isServer;
 		this.camera = new Camera(Renderer.RESOLUTION_X, Renderer.RESOLUTION_Y);
+		
+		Vibrator vibrator = this.gameScreen.getVibrator();
+		LevelDefinition levelDefinition = getLevelDefinition(laps);
+		
+		this.level = new Level(this.camera, levelDefinition);
+		
+		this.playerBox = new PlayerBox(this.camera, this.level, vibrator, 0, Renderer.RESOLUTION_Y / 2, this.player.color);
+		
+		for (Player enemyPlayer : this.enemyPlayers)
+		{
+			EnemyBox box = new EnemyBox(this.camera, this.level, 0, Renderer.RESOLUTION_Y / 2, enemyPlayer.color);
+			this.enemyBoxes.put(enemyPlayer.id, box);
+		}
 		
 		this.alarmCountdown = new Alarm(new OnAlarmRing()
 		{
@@ -89,18 +102,6 @@ public class Game implements GameEvent
 		if (this.renderer == null)
 		{
 			this.renderer = renderer;
-			
-			Vibrator vibrator = this.gameScreen.getVibrator();
-			LevelDefinition levelDefinition = getLevelDefinition();
-			
-			this.level = new Level(this.camera, levelDefinition);
-			this.playerBox = new PlayerBox(this.camera, this.level, vibrator, 0, Renderer.RESOLUTION_Y / 2, this.player.color);
-			
-			for (Player player : this.enemyPlayers)
-			{
-				EnemyBox box = new EnemyBox(this.camera, this.level, 0, Renderer.RESOLUTION_Y / 2, player.color);
-				this.enemyBoxes.put(player.id, box);
-			}
 		}
 	}
 	
@@ -115,9 +116,9 @@ public class Game implements GameEvent
 		}
 	}
 	
-	private LevelDefinition getLevelDefinition()
+	private LevelDefinition getLevelDefinition(int laps)
 	{
-		LevelDefinition result = new LevelDefinition(200, 3);
+		LevelDefinition result = new LevelDefinition(200, laps);
 		
 		Shape obstacle = new Rectangle(5, 15, LevelDefinition.WALL_COLOR);
 		

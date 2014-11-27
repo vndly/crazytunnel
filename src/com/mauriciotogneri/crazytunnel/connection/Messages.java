@@ -96,12 +96,14 @@ public class Messages
 	
 	public static class SetFinalPlayersList
 	{
+		public final int laps;
 		public final List<Player> players;
 		
 		public static final byte CODE = 4;
 		
 		public SetFinalPlayersList(MessageReader reader)
 		{
+			this.laps = reader.getInt();
 			this.players = new ArrayList<Player>();
 			
 			int length = reader.getInt();
@@ -117,10 +119,11 @@ public class Messages
 			}
 		}
 		
-		public static byte[] create(List<Player> players)
+		public static byte[] create(int laps, List<Player> players)
 		{
 			MessageWriter writer = new MessageWriter();
 			writer.putByte(SetFinalPlayersList.CODE);
+			writer.putInt(laps);
 			writer.putInt(players.size());
 			
 			for (Player player : players)

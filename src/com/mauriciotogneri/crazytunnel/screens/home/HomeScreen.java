@@ -21,6 +21,11 @@ public class HomeScreen extends BaseFragment
 		numberOfPlayers.setMaxValue(6);
 		numberOfPlayers.setValue(4);
 		
+		NumberPicker numberOfLaps = findViewById(R.id.number_of_laps);
+		numberOfLaps.setMinValue(1);
+		numberOfLaps.setMaxValue(10);
+		numberOfLaps.setValue(5);
+		
 		Button createMatch = findViewById(R.id.create_game);
 		createMatch.setOnClickListener(new OnClickListener()
 		{
@@ -58,10 +63,12 @@ public class HomeScreen extends BaseFragment
 			Preferences.setPlayerName(playerName);
 			
 			int numberOfPlayers = getNumberOfPlayers();
+			int numberOfLaps = getNumberOfLaps();
 			
 			LobbyServerScreen lobbyServer = new LobbyServerScreen();
 			lobbyServer.setParameter(LobbyServerScreen.PARAMETER_PLAYER_NAME, playerName);
 			lobbyServer.setParameter(LobbyServerScreen.PARAMETER_NUMBER_OF_PLAYERS, numberOfPlayers);
+			lobbyServer.setParameter(LobbyServerScreen.PARAMETER_NUMBER_OF_LAPS, numberOfLaps);
 			openFragment(lobbyServer);
 		}
 	}
@@ -98,6 +105,13 @@ public class HomeScreen extends BaseFragment
 		NumberPicker numberOfPlayers = findViewById(R.id.number_of_players);
 		
 		return numberOfPlayers.getValue();
+	}
+	
+	private int getNumberOfLaps()
+	{
+		NumberPicker numberOfLaps = findViewById(R.id.number_of_laps);
+		
+		return numberOfLaps.getValue();
 	}
 	
 	@Override

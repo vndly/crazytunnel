@@ -31,6 +31,8 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 	private ServerConnection serverConnection;
 	private PlayerAdapter playerAdapter;
 	
+	private int numberOfLaps = 1;
+	
 	private final Object playerIdLock = new Object();
 	private byte nextPlayerId = 1;
 	
@@ -44,6 +46,7 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 	
 	public static final String PARAMETER_PLAYER_NAME = "player_name";
 	public static final String PARAMETER_NUMBER_OF_PLAYERS = "number_of_players";
+	public static final String PARAMETER_NUMBER_OF_LAPS = "number_of_laps";
 	
 	@Override
 	protected void onInitialize()
@@ -79,6 +82,7 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 		});
 		
 		int numberOfPlayers = getParameter(LobbyServerScreen.PARAMETER_NUMBER_OF_PLAYERS);
+		this.numberOfLaps = getParameter(LobbyServerScreen.PARAMETER_NUMBER_OF_LAPS);
 		
 		this.serverConnection = new ServerConnection(this, getContext());
 		this.serverConnection.listen(LobbyServerScreen.UUID, numberOfPlayers, LobbyServerScreen.VISIBILITY_DURATION);
@@ -316,7 +320,7 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 			}
 		}
 		
-		this.serverConnection.sendAll(Messages.SetFinalPlayersList.create(list), true);
+		this.serverConnection.sendAll(Messages.SetFinalPlayersList.create(this.numberOfLaps, list), true);
 		
 		GameConnection gameConnection = new GameConnection(this.serverConnection);
 		
@@ -324,6 +328,7 @@ public class LobbyServerScreen extends BaseFragment implements ServerEvent
 		gameScreen.setParameter(GameScreen.PARAMETER_GAME_CONNECTION, gameConnection);
 		gameScreen.setParameter(GameScreen.PARAMETER_PLAYER, this.player);
 		gameScreen.setParameter(GameScreen.PARAMETER_PLAYERS, list);
+		gameScreen.setParameter(GameScreen.PARAMETER_LAPS, this.numberOfLaps);
 		openFragment(gameScreen);
 	}
 	

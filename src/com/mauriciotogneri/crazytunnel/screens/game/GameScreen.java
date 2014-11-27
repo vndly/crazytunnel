@@ -18,6 +18,7 @@ public class GameScreen extends BaseFragment
 	public static final String PARAMETER_GAME_CONNECTION = "game_connection";
 	public static final String PARAMETER_PLAYER = "player";
 	public static final String PARAMETER_PLAYERS = "players";
+	public static final String PARAMETER_LAPS = "laps";
 	
 	@Override
 	protected void onInitialize()
@@ -28,8 +29,9 @@ public class GameScreen extends BaseFragment
 		List<Player> players = getParameter(GameScreen.PARAMETER_PLAYERS);
 		
 		List<Player> enemyPlayers = getEnemyPlayers(player, players);
+		int laps = getParameter(GameScreen.PARAMETER_LAPS);
 		
-		this.game = new Game(this, this.gameConnection, player, enemyPlayers, this.gameConnection.isServer());
+		this.game = new Game(this, this.gameConnection, player, enemyPlayers, laps, this.gameConnection.isServer());
 		this.gameConnection.setListener(this.game);
 		
 		this.screen = findViewById(R.id.glSurface);

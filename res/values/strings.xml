@@ -4,7 +4,8 @@
     <string name="app_name">Crazy Tunnel</string>
     
     <string name="home_player_name">Player name:</string>
-    <string name="home_max_number_of_players">Max number of players</string>
+    <string name="home_max_number_of_players">Max number of players:</string>
+    <string name="home_laps">Laps:</string>
     <string name="home_create_game">Create game</string>
     <string name="home_join_game">Join game</string>
     

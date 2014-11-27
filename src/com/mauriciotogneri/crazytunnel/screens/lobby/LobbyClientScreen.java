@@ -108,6 +108,7 @@ public class LobbyClientScreen extends BaseFragment implements ClientEvent
 		gameScreen.setParameter(GameScreen.PARAMETER_GAME_CONNECTION, gameConnection);
 		gameScreen.setParameter(GameScreen.PARAMETER_PLAYER, this.player);
 		gameScreen.setParameter(GameScreen.PARAMETER_PLAYERS, setFinalPlayersList.players);
+		gameScreen.setParameter(GameScreen.PARAMETER_LAPS, setFinalPlayersList.laps);
 		openFragment(gameScreen);
 	}
 	
