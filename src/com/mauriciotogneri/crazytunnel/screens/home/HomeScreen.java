@@ -24,7 +24,7 @@ public class HomeScreen extends BaseFragment
 		NumberPicker numberOfLaps = findViewById(R.id.number_of_laps);
 		numberOfLaps.setMinValue(1);
 		numberOfLaps.setMaxValue(10);
-		numberOfLaps.setValue(5);
+		numberOfLaps.setValue(3);
 		
 		Button createMatch = findViewById(R.id.create_game);
 		createMatch.setOnClickListener(new OnClickListener()

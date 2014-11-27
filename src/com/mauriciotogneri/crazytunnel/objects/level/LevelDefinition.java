@@ -40,7 +40,7 @@ public class LevelDefinition
 		this.laps = laps;
 		this.length = getLength(root);
 		
-		Shape wall = new Rectangle(Renderer.RESOLUTION_X * (laps + 2), LevelDefinition.WALL_HEIGHT, LevelDefinition.WALL_COLOR);
+		Shape wall = new Rectangle((this.length * laps) + (Renderer.RESOLUTION_X * 2), LevelDefinition.WALL_HEIGHT, LevelDefinition.WALL_COLOR);
 		Sprite wallBottom = new Sprite(wall, -Renderer.RESOLUTION_X, 0);
 		Sprite wallTop = new Sprite(wall, -Renderer.RESOLUTION_X, Renderer.RESOLUTION_Y - LevelDefinition.WALL_HEIGHT);
 		
