@@ -1,7 +1,6 @@
 package com.mauriciotogneri.crazytunnel.screens.game;
 
 import java.util.List;
-import com.mauriciotogneri.crazytunnel.Player;
 import com.mauriciotogneri.crazytunnel.R;
 import com.mauriciotogneri.crazytunnel.activities.BaseFragment;
 import com.mauriciotogneri.crazytunnel.connection.tcp.ClientConnection;
@@ -9,6 +8,7 @@ import com.mauriciotogneri.crazytunnel.connection.udp.Connection;
 import com.mauriciotogneri.crazytunnel.engine.CustomSurfaceView;
 import com.mauriciotogneri.crazytunnel.engine.Game;
 import com.mauriciotogneri.crazytunnel.engine.Renderer;
+import com.mauriciotogneri.crazytunnel.objects.Player;
 
 public class GameScreen extends BaseFragment
 {

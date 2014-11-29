@@ -7,8 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-import com.mauriciotogneri.crazytunnel.Player;
 import com.mauriciotogneri.crazytunnel.R;
+import com.mauriciotogneri.crazytunnel.objects.Player;
 
 public class PlayerAdapter extends ArrayAdapter<Player>
 {

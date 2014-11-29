@@ -6,7 +6,6 @@ import java.util.List;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import com.mauriciotogneri.crazytunnel.Player;
 import com.mauriciotogneri.crazytunnel.R;
 import com.mauriciotogneri.crazytunnel.activities.BaseFragment;
 import com.mauriciotogneri.crazytunnel.connection.tcp.ClientConnection;
@@ -18,6 +17,7 @@ import com.mauriciotogneri.crazytunnel.messages.Messages;
 import com.mauriciotogneri.crazytunnel.messages.Messages.PlayerInfo;
 import com.mauriciotogneri.crazytunnel.messages.Messages.PlayersList;
 import com.mauriciotogneri.crazytunnel.messages.Messages.StartGame;
+import com.mauriciotogneri.crazytunnel.objects.Player;
 import com.mauriciotogneri.crazytunnel.screens.game.GameScreen;
 import com.mauriciotogneri.crazytunnel.util.ConnectionUtils;
 
