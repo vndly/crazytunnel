@@ -3,22 +3,27 @@ package com.mauriciotogneri.crazytunnel.connection;
 import java.awt.Color;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import com.mauriciotogneri.crazytunnel.Player;
 import com.mauriciotogneri.crazytunnel.connection.tcp.Server;
 import com.mauriciotogneri.crazytunnel.connection.tcp.Server.ServerEvent;
+import com.mauriciotogneri.crazytunnel.connection.udp.Connection;
+import com.mauriciotogneri.crazytunnel.connection.udp.Connection.ConnectionEvent;
+import com.mauriciotogneri.crazytunnel.messages.MessageReader;
 import com.mauriciotogneri.crazytunnel.messages.Messages;
 import com.mauriciotogneri.crazytunnel.messages.Messages.PlayerBoxPosition;
 import com.mauriciotogneri.crazytunnel.messages.Messages.PlayerConnect;
+import com.mauriciotogneri.crazytunnel.objects.Player;
 
-public class Game implements ServerEvent
+public class Game implements ServerEvent, ConnectionEvent
 {
 	private final Server server;
+	private final Connection connection;
 	
 	private int playersReady = 0;
 	
@@ -33,9 +38,10 @@ public class Game implements ServerEvent
 	private final int numberOfPlayers;
 	private final int numberOfLaps;
 	
-	public Game(int port, int numberOfPlayers, int numberOfLaps)
+	public Game(int port, int numberOfPlayers, int numberOfLaps) throws SocketException
 	{
 		this.server = new Server(this, port);
+		this.connection = new Connection(this);
 		
 		this.numberOfPlayers = numberOfPlayers;
 		this.numberOfLaps = numberOfLaps;
@@ -49,7 +55,8 @@ public class Game implements ServerEvent
 		
 		try
 		{
-			System.out.println(InetAddress.getLocalHost() + ":" + port);
+			System.out.println("TCP: " + InetAddress.getLocalHost() + ":" + port);
+			System.out.println("UDP: " + InetAddress.getLocalHost() + ":" + this.connection.getLocalPort());
 		}
 		catch (UnknownHostException e)
 		{
@@ -60,20 +67,32 @@ public class Game implements ServerEvent
 	public void start()
 	{
 		this.server.start();
+		this.connection.start();
+	}
+	
+	public int getUdpPort()
+	{
+		return this.connection.getLocalPort();
 	}
 	
 	@Override
 	public void onConnected(Socket socket)
 	{
-		System.out.println("NEW CONNECTION: " + socket.getRemoteSocketAddress());
+		System.out.println("NEW CONNECTION: " + socket.getInetAddress().getHostAddress());
 		
 		Client client = new Client(this, socket);
 		client.start();
 	}
 	
+	@Override
+	public void onFinished()
+	{
+		// TODO
+	}
+	
 	public void clientDisconnect(Client client)
 	{
-		System.out.println("CLIENT DISCONNECTED: " + client.getRemoteAddress());
+		System.out.println("CLIENT DISCONNECTED: " + client.getRemoteAddress().getHostAddress());
 		
 		this.registeredPlayers.remove(client);
 	}
@@ -84,8 +103,7 @@ public class Game implements ServerEvent
 		
 		synchronized (this.colorLock)
 		{
-			result = this.colorIndex.get(0);
-			this.colorIndex.remove(0);
+			result = this.colorIndex.remove(0);
 		}
 		
 		return result;
@@ -190,6 +208,36 @@ public class Game implements ServerEvent
 			if (client != excludeClient)
 			{
 				client.send(message);
+			}
+		}
+	}
+	
+	@Override
+	public void onReceive(InetAddress address, int port, byte[] message)
+	{
+		if (message.length > 0)
+		{
+			MessageReader reader = new MessageReader(message);
+			byte code = reader.getByte();
+			
+			switch (code)
+			{
+				case Messages.PlayerBoxPosition.CODE:
+					processPlayerBoxPosition(address, message);
+					break;
+			}
+		}
+	}
+	
+	private void processPlayerBoxPosition(InetAddress address, byte[] message)
+	{
+		Set<Client> clientList = this.registeredPlayers.keySet();
+		
+		for (Client client : clientList)
+		{
+			if (!client.getRemoteAddress().equals(address))
+			{
+				this.connection.send(client.getRemoteAddress(), client.getUdpPort(), message);
 			}
 		}
 	}

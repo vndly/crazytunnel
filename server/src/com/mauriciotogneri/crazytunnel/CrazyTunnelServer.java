@@ -6,7 +6,14 @@ public class CrazyTunnelServer
 {
 	public static void main(String[] args)
 	{
-		Game game = new Game(7777, 2, 3);
-		game.start();
+		try
+		{
+			Game game = new Game(7777, 2, 3);
+			game.start();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 }

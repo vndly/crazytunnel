@@ -1,19 +1,20 @@
 package com.mauriciotogneri.crazytunnel.connection;
 
+import java.net.InetAddress;
 import java.net.Socket;
-import com.mauriciotogneri.crazytunnel.Player;
 import com.mauriciotogneri.crazytunnel.connection.tcp.ServerConnection;
 import com.mauriciotogneri.crazytunnel.connection.tcp.ServerConnection.ServerConnectionEvent;
 import com.mauriciotogneri.crazytunnel.messages.MessageReader;
 import com.mauriciotogneri.crazytunnel.messages.Messages;
-import com.mauriciotogneri.crazytunnel.messages.Messages.PlayerBoxPosition;
 import com.mauriciotogneri.crazytunnel.messages.Messages.PlayerConnect;
 import com.mauriciotogneri.crazytunnel.messages.Messages.PlayerInfo;
+import com.mauriciotogneri.crazytunnel.objects.Player;
 
 public class Client implements ServerConnectionEvent
 {
 	private final Game game;
 	private final ServerConnection serverConnection;
+	private int udpPort = 0;
 	
 	public Client(Game game, Socket socket)
 	{
@@ -26,7 +27,12 @@ public class Client implements ServerConnectionEvent
 		this.serverConnection.start();
 	}
 	
-	public String getRemoteAddress()
+	public int getUdpPort()
+	{
+		return this.udpPort;
+	}
+	
+	public InetAddress getRemoteAddress()
 	{
 		return this.serverConnection.getRemoteAddress();
 	}
@@ -40,22 +46,21 @@ public class Client implements ServerConnectionEvent
 	@Override
 	public void onReceive(byte[] message)
 	{
-		MessageReader reader = new MessageReader(message);
-		byte code = reader.getByte();
-		
-		switch (code)
+		if (message.length > 0)
 		{
-			case Messages.PlayerConnect.CODE:
-				processPlayerConnect(new PlayerConnect(reader));
-				break;
+			MessageReader reader = new MessageReader(message);
+			byte code = reader.getByte();
 			
-			case Messages.Ready.CODE:
-				this.game.processReady();
-				break;
-			
-			case Messages.PlayerBoxPosition.CODE:
-				this.game.processPlayerBoxPosition(this, new PlayerBoxPosition(reader));
-				break;
+			switch (code)
+			{
+				case Messages.PlayerConnect.CODE:
+					processPlayerConnect(new PlayerConnect(reader));
+					break;
+				
+				case Messages.Ready.CODE:
+					this.game.processReady();
+					break;
+			}
 		}
 	}
 	
@@ -70,7 +75,9 @@ public class Client implements ServerConnectionEvent
 		
 		if (player != null)
 		{
-			send(PlayerInfo.create(player.id, playerConnect.name, player.color));
+			this.udpPort = playerConnect.udpPort;
+			
+			send(PlayerInfo.create(player.id, playerConnect.name, player.color, this.game.getUdpPort()));
 			this.game.sendPlayerList();
 			this.game.checkStartRace();
 		}
