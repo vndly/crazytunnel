@@ -1,8 +1,8 @@
 package com.mauriciotogneri.crazytunnel.screens.lobby;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
-import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -11,6 +11,8 @@ import com.mauriciotogneri.crazytunnel.R;
 import com.mauriciotogneri.crazytunnel.activities.BaseFragment;
 import com.mauriciotogneri.crazytunnel.connection.tcp.ClientConnection;
 import com.mauriciotogneri.crazytunnel.connection.tcp.ClientConnection.ClientConnectionEvent;
+import com.mauriciotogneri.crazytunnel.connection.udp.Connection;
+import com.mauriciotogneri.crazytunnel.connection.udp.Connection.ConnectionEvent;
 import com.mauriciotogneri.crazytunnel.messages.MessageReader;
 import com.mauriciotogneri.crazytunnel.messages.Messages;
 import com.mauriciotogneri.crazytunnel.messages.Messages.PlayerInfo;
@@ -19,12 +21,15 @@ import com.mauriciotogneri.crazytunnel.messages.Messages.StartGame;
 import com.mauriciotogneri.crazytunnel.screens.game.GameScreen;
 import com.mauriciotogneri.crazytunnel.util.ConnectionUtils;
 
-public class LobbyScreen extends BaseFragment implements ClientConnectionEvent
+public class LobbyScreen extends BaseFragment implements ClientConnectionEvent, ConnectionEvent
 {
 	private Player player;
-	private ClientConnection clientconnection;
 	private PlayerAdapter playerAdapter;
 	
+	private Connection connection;
+	private ClientConnection clientconnection;
+	
+	private int udpPort = 0;
 	private String playerName = "";
 	
 	public static final String PARAMETER_PLAYER_NAME = "player_name";
@@ -45,21 +50,33 @@ public class LobbyScreen extends BaseFragment implements ClientConnectionEvent
 		
 		this.clientconnection = new ClientConnection(serverIP, serverPort, this);
 		this.clientconnection.start();
+		
+		try
+		{
+			this.connection = new Connection(this);
+			this.connection.start();
+		}
+		catch (Exception e)
+		{
+			finish();
+			showToast("ERROR CREATING CONNECTION");
+		}
 	}
 	
-	private void processSetPlayerInfo(PlayerInfo setPlayerInfo)
+	private void processPlayerInfo(PlayerInfo playerInfo)
 	{
-		this.player = new Player(setPlayerInfo.id, setPlayerInfo.name, setPlayerInfo.color);
+		this.player = new Player(playerInfo.id, playerInfo.name, playerInfo.color);
+		this.udpPort = playerInfo.udpPort;
 	}
 	
-	private void processSetPlayersList(final PlayersList setRegisteredPlayers)
+	private void processPlayersList(final PlayersList registeredPlayers)
 	{
 		runOnUiThread(new Runnable()
 		{
 			@Override
 			public void run()
 			{
-				refreshPlayerList(setRegisteredPlayers.players);
+				refreshPlayerList(registeredPlayers.players);
 			}
 		});
 	}
@@ -84,7 +101,9 @@ public class LobbyScreen extends BaseFragment implements ClientConnectionEvent
 		GameScreen gameScreen = new GameScreen();
 		gameScreen.setParameter(GameScreen.PARAMETER_PLAYER, this.player);
 		gameScreen.setParameter(GameScreen.PARAMETER_ENEMIES, enemies);
-		gameScreen.setParameter(GameScreen.PARAMETER_CONNECTION, this.clientconnection);
+		gameScreen.setParameter(GameScreen.PARAMETER_CONNECTION_TCP, this.clientconnection);
+		gameScreen.setParameter(GameScreen.PARAMETER_CONNECTION_UDP, this.connection);
+		gameScreen.setParameter(GameScreen.PARAMETER_SERVER_UDP_PORT, this.udpPort);
 		gameScreen.setParameter(GameScreen.PARAMETER_LAPS, startGame.laps);
 		openFragment(gameScreen);
 	}
@@ -119,7 +138,7 @@ public class LobbyScreen extends BaseFragment implements ClientConnectionEvent
 	@Override
 	public void onConnect()
 	{
-		ConnectionUtils.send(this.clientconnection, Messages.PlayerConnect.create(this.playerName));
+		ConnectionUtils.send(this.clientconnection, Messages.PlayerConnect.create(this.playerName, this.connection.getLocalPort()));
 	}
 	
 	@Override
@@ -139,8 +158,6 @@ public class LobbyScreen extends BaseFragment implements ClientConnectionEvent
 	@Override
 	public void onReceive(byte[] message)
 	{
-		Log.e("TEST", "<<< RECEIVED: " + message[0]);
-		
 		if (message.length > 0)
 		{
 			MessageReader reader = new MessageReader(message);
@@ -149,11 +166,11 @@ public class LobbyScreen extends BaseFragment implements ClientConnectionEvent
 			switch (code)
 			{
 				case Messages.PlayerInfo.CODE:
-					processSetPlayerInfo(new PlayerInfo(reader));
+					processPlayerInfo(new PlayerInfo(reader));
 					break;
 				
 				case Messages.PlayersList.CODE:
-					processSetPlayersList(new PlayersList(reader));
+					processPlayersList(new PlayersList(reader));
 					break;
 				
 				case Messages.StartGame.CODE:
@@ -161,5 +178,10 @@ public class LobbyScreen extends BaseFragment implements ClientConnectionEvent
 					break;
 			}
 		}
+	}
+	
+	@Override
+	public void onReceive(InetAddress address, int port, byte[] message)
+	{
 	}
 }

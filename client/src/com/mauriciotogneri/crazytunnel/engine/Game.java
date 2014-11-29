@@ -1,14 +1,16 @@
 package com.mauriciotogneri.crazytunnel.engine;
 
+import java.net.InetAddress;
 import java.util.List;
 import android.content.Context;
 import android.os.Vibrator;
-import android.util.Log;
 import android.util.SparseArray;
 import com.mauriciotogneri.crazytunnel.Player;
 import com.mauriciotogneri.crazytunnel.R;
 import com.mauriciotogneri.crazytunnel.connection.tcp.ClientConnection;
 import com.mauriciotogneri.crazytunnel.connection.tcp.ClientConnection.ClientConnectionEvent;
+import com.mauriciotogneri.crazytunnel.connection.udp.Connection;
+import com.mauriciotogneri.crazytunnel.connection.udp.Connection.ConnectionEvent;
 import com.mauriciotogneri.crazytunnel.input.InputEvent;
 import com.mauriciotogneri.crazytunnel.messages.MessageReader;
 import com.mauriciotogneri.crazytunnel.messages.Messages;
@@ -20,11 +22,14 @@ import com.mauriciotogneri.crazytunnel.objects.level.LevelDefinition;
 import com.mauriciotogneri.crazytunnel.screens.game.GameScreen;
 import com.mauriciotogneri.crazytunnel.util.ConnectionUtils;
 
-public class Game implements ClientConnectionEvent
+public class Game implements ClientConnectionEvent, ConnectionEvent
 {
-	private final ClientConnection clientConnection;
 	private final GameScreen gameScreen;
 	private Renderer renderer;
+	
+	private final int udpPort;
+	private final Connection connection;
+	private final ClientConnection clientConnection;
 	
 	private final Player player;
 	private final List<Player> enemies;
@@ -45,12 +50,16 @@ public class Game implements ClientConnectionEvent
 		FINISHED; // the race is finished
 	}
 	
-	public Game(GameScreen gameScreen, ClientConnection clientConnection, Player player, List<Player> enemies, int laps)
+	public Game(GameScreen gameScreen, ClientConnection clientConnection, Connection connection, int udpPort, Player player, List<Player> enemies, int laps)
 	{
 		this.gameScreen = gameScreen;
 		
+		this.udpPort = udpPort;
+		this.connection = connection;
+		this.connection.setCallback(this);
+		
 		this.clientConnection = clientConnection;
-		clientConnection.setCallback(this);
+		this.clientConnection.setCallback(this);
 		
 		this.player = player;
 		this.enemies = enemies;
@@ -168,7 +177,7 @@ public class Game implements ClientConnectionEvent
 		{
 			this.lastInput = input.jump;
 			
-			ConnectionUtils.send(this.clientConnection, Messages.PlayerBoxPosition.create(player.id, box.getX(), box.getY(), input.jump));
+			ConnectionUtils.send(this.connection, this.clientConnection.getRemoteAddress(), this.udpPort, Messages.PlayerBoxPosition.create(player.id, box.getX(), box.getY(), input.jump));
 		}
 	}
 	
@@ -253,8 +262,6 @@ public class Game implements ClientConnectionEvent
 	@Override
 	public void onReceive(byte[] message)
 	{
-		Log.e("TEST", "<<< RECEIVED: " + message[0]);
-		
 		if (message.length > 0)
 		{
 			MessageReader reader = new MessageReader(message);
@@ -269,7 +276,20 @@ public class Game implements ClientConnectionEvent
 				case Messages.RestartRace.CODE:
 					restartRace();
 					break;
-				
+			}
+		}
+	}
+	
+	@Override
+	public void onReceive(InetAddress address, int port, byte[] message)
+	{
+		if (message.length > 0)
+		{
+			MessageReader reader = new MessageReader(message);
+			byte code = reader.getByte();
+			
+			switch (code)
+			{
 				case Messages.PlayerBoxPosition.CODE:
 					updateBoxPosition(new PlayerBoxPosition(reader));
 					break;
