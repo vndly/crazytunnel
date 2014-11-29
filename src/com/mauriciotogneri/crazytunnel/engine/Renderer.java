@@ -197,7 +197,7 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer
 		}
 		
 		this.startTime = System.nanoTime();
-		this.game.start(this);
+		this.game.setRenderer(this);
 	}
 	
 	public void pause(boolean finishing)

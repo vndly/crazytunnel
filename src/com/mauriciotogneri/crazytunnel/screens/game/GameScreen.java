@@ -1,62 +1,49 @@
 package com.mauriciotogneri.crazytunnel.screens.game;
 
-import java.util.ArrayList;
 import java.util.List;
+import com.mauriciotogneri.crazytunnel.Player;
 import com.mauriciotogneri.crazytunnel.R;
 import com.mauriciotogneri.crazytunnel.activities.BaseFragment;
+import com.mauriciotogneri.crazytunnel.connection.tcp.ClientConnection;
 import com.mauriciotogneri.crazytunnel.engine.CustomSurfaceView;
 import com.mauriciotogneri.crazytunnel.engine.Game;
 import com.mauriciotogneri.crazytunnel.engine.Renderer;
-import com.mauriciotogneri.crazytunnel.objects.Player;
 
 public class GameScreen extends BaseFragment
 {
 	private Game game;
-	private GameConnection gameConnection;
 	private CustomSurfaceView screen;
 	
-	public static final String PARAMETER_GAME_CONNECTION = "game_connection";
 	public static final String PARAMETER_PLAYER = "player";
-	public static final String PARAMETER_PLAYERS = "players";
+	public static final String PARAMETER_ENEMIES = "enemies";
+	public static final String PARAMETER_CONNECTION = "coonection";
 	public static final String PARAMETER_LAPS = "laps";
 	
 	@Override
 	protected void onInitialize()
 	{
-		this.gameConnection = getParameter(GameScreen.PARAMETER_GAME_CONNECTION);
-		
 		Player player = getParameter(GameScreen.PARAMETER_PLAYER);
-		List<Player> players = getParameter(GameScreen.PARAMETER_PLAYERS);
+		List<Player> enemies = getParameter(GameScreen.PARAMETER_ENEMIES);
 		
-		List<Player> enemyPlayers = getEnemyPlayers(player, players);
+		ClientConnection clientConnection = getParameter(GameScreen.PARAMETER_CONNECTION);
+		
 		int laps = getParameter(GameScreen.PARAMETER_LAPS);
 		
-		this.game = new Game(this, this.gameConnection, player, enemyPlayers, laps, this.gameConnection.isServer());
-		this.gameConnection.setListener(this.game);
+		this.game = new Game(this, clientConnection, player, enemies, laps);
 		
 		this.screen = findViewById(R.id.glSurface);
 		this.screen.setRenderer(new Renderer(this.game, getContext(), this.screen));
 	}
 	
-	private List<Player> getEnemyPlayers(Player player, List<Player> players)
+	public void onDisconnect()
 	{
-		List<Player> result = new ArrayList<Player>();
-		
-		for (Player currentPlayer : players)
-		{
-			if (currentPlayer.id != player.id)
-			{
-				result.add(currentPlayer);
-			}
-		}
-		
-		return result;
+		finish();
+		showToast("DISCONNECTED");
 	}
 	
-	public void disconnected()
+	public void showMessage(String message)
 	{
-		showToast("DISCONNECTED");
-		close();
+		showToast(message);
 	}
 	
 	@Override

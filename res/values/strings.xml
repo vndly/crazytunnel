@@ -4,14 +4,9 @@
     <string name="app_name">Crazy Tunnel</string>
     
     <string name="home_player_name">Player name:</string>
-    <string name="home_max_number_of_players">Max number of players:</string>
-    <string name="home_laps">Laps:</string>
-    <string name="home_create_game">Create game</string>
+    <string name="home_server_ip">Server IP:</string>
+    <string name="home_server_port">Port:</string>
     <string name="home_join_game">Join game</string>
-    
-    <string name="lobby_start_game">Start game</string>
-
-    <string name="game_selection_title">Select game</string>
     
     <string name="client_lobby_title">Game lobby</string>
     

@@ -3,116 +3,81 @@ package com.mauriciotogneri.crazytunnel.engine;
 import java.util.List;
 import android.content.Context;
 import android.os.Vibrator;
+import android.util.Log;
 import android.util.SparseArray;
+import com.mauriciotogneri.crazytunnel.Player;
 import com.mauriciotogneri.crazytunnel.R;
-import com.mauriciotogneri.crazytunnel.connection.MessageReader;
-import com.mauriciotogneri.crazytunnel.connection.Messages;
-import com.mauriciotogneri.crazytunnel.connection.Messages.SetPlayerBoxPosition;
-import com.mauriciotogneri.crazytunnel.engine.Alarm.OnAlarmRing;
+import com.mauriciotogneri.crazytunnel.connection.tcp.ClientConnection;
+import com.mauriciotogneri.crazytunnel.connection.tcp.ClientConnection.ClientConnectionEvent;
 import com.mauriciotogneri.crazytunnel.input.InputEvent;
-import com.mauriciotogneri.crazytunnel.objects.Player;
+import com.mauriciotogneri.crazytunnel.messages.MessageReader;
+import com.mauriciotogneri.crazytunnel.messages.Messages;
+import com.mauriciotogneri.crazytunnel.messages.Messages.PlayerBoxPosition;
 import com.mauriciotogneri.crazytunnel.objects.box.EnemyBox;
 import com.mauriciotogneri.crazytunnel.objects.box.PlayerBox;
 import com.mauriciotogneri.crazytunnel.objects.level.Level;
 import com.mauriciotogneri.crazytunnel.objects.level.LevelDefinition;
-import com.mauriciotogneri.crazytunnel.screens.game.GameConnection;
-import com.mauriciotogneri.crazytunnel.screens.game.GameEvent;
 import com.mauriciotogneri.crazytunnel.screens.game.GameScreen;
+import com.mauriciotogneri.crazytunnel.util.ConnectionUtils;
 
-public class Game implements GameEvent
+public class Game implements ClientConnectionEvent
 {
+	private final ClientConnection clientConnection;
 	private final GameScreen gameScreen;
-	private final GameConnection gameConnection;
-	private final boolean isServer;
 	private Renderer renderer;
 	
 	private final Player player;
-	private final List<Player> enemyPlayers;
+	private final List<Player> enemies;
 	
 	private final Camera camera;
 	
-	private PlayerBox playerBox;
-	
+	private final PlayerBox playerBox;
 	private final SparseArray<EnemyBox> enemyBoxes = new SparseArray<EnemyBox>();
 	
-	private Level level;
-	
-	private final Alarm alarmCountdown;
-	private final Alarm alarmFinished;
+	private final Level level;
 	
 	private GameStatus gameStatus = GameStatus.READY;
 	
 	private enum GameStatus
 	{
 		READY, // all the players in the starting line
-		COUNTDOWN, // the countdown is decreasing
 		RUNNING, // the race is on
 		FINISHED; // the race is finished
 	}
 	
-	public Game(GameScreen gameScreen, GameConnection gameConnection, Player player, List<Player> enemyPlayers, int laps, boolean isServer)
+	public Game(GameScreen gameScreen, ClientConnection clientConnection, Player player, List<Player> enemies, int laps)
 	{
 		this.gameScreen = gameScreen;
-		this.gameConnection = gameConnection;
+		
+		this.clientConnection = clientConnection;
+		clientConnection.setCallback(this);
 		
 		this.player = player;
-		this.enemyPlayers = enemyPlayers;
+		this.enemies = enemies;
 		
-		this.isServer = isServer;
 		this.camera = new Camera(Renderer.RESOLUTION_X, Renderer.RESOLUTION_Y);
 		
-		Vibrator vibrator = this.gameScreen.getVibrator();
+		Vibrator vibrator = gameScreen.getVibrator();
 		LevelDefinition levelDefinition = getLevelDefinition(gameScreen.getContext(), R.raw.map, laps);
 		
 		this.level = new Level(this.camera, levelDefinition);
 		
 		this.playerBox = new PlayerBox(this.camera, this.level, vibrator, 0, Renderer.RESOLUTION_Y / 2, this.player.color);
 		
-		for (Player enemyPlayer : this.enemyPlayers)
+		for (Player enemyPlayer : this.enemies)
 		{
 			EnemyBox box = new EnemyBox(this.camera, this.level, 0, Renderer.RESOLUTION_Y / 2, enemyPlayer.color);
 			this.enemyBoxes.put(enemyPlayer.id, box);
 		}
-		
-		this.alarmCountdown = new Alarm(new OnAlarmRing()
-		{
-			@Override
-			public boolean onAlarmRing()
-			{
-				countdownFinished();
-				
-				return false;
-			}
-		}, 3 * 1000);
-		
-		this.alarmFinished = new Alarm(new OnAlarmRing()
-		{
-			@Override
-			public boolean onAlarmRing()
-			{
-				leaderboardFinished();
-				
-				return false;
-			}
-		}, 3 * 1000);
 	}
 	
-	public void start(Renderer renderer)
+	public void setRenderer(Renderer renderer)
 	{
 		if (this.renderer == null)
 		{
 			this.renderer = renderer;
-		}
-	}
-	
-	private void restart()
-	{
-		this.playerBox.restart();
-		
-		for (int i = 0, size = this.enemyBoxes.size(); i < size; i++)
-		{
-			EnemyBox box = this.enemyBoxes.valueAt(i);
-			box.restart();
+			
+			ConnectionUtils.send(this.clientConnection, Messages.Ready.create());
 		}
 	}
 	
@@ -137,30 +102,13 @@ public class Game implements GameEvent
 				break;
 			
 			case READY:
-				processReady();
-				break;
-			
-			case COUNTDOWN:
-				this.alarmCountdown.step(delta);
 				break;
 			
 			case FINISHED:
-				this.alarmFinished.step(delta);
 				break;
 		}
 		
 		render(renderer, this.camera, this.level, this.playerBox, this.enemyBoxes);
-	}
-	
-	private void processReady()
-	{
-		restart();
-		
-		if (this.isServer)
-		{
-			this.gameStatus = GameStatus.COUNTDOWN;
-			this.alarmCountdown.restart();
-		}
 	}
 	
 	private void processRunning(float delta, InputEvent input)
@@ -174,11 +122,9 @@ public class Game implements GameEvent
 			box.update(delta);
 		}
 		
-		if (this.isServer && this.playerBox.finished() && enemiesFinished(this.enemyBoxes))
+		if (this.playerBox.finished())
 		{
-			this.gameStatus = GameStatus.FINISHED;
-			
-			this.alarmFinished.restart();
+			// TODO: inform to server that player finished
 		}
 	}
 	
@@ -222,7 +168,7 @@ public class Game implements GameEvent
 		{
 			this.lastInput = input.jump;
 			
-			this.gameConnection.send(Messages.SetPlayerBoxPosition.create(player, box, input.jump), true);
+			ConnectionUtils.send(this.clientConnection, Messages.PlayerBoxPosition.create(player.id, box.getX(), box.getY(), input.jump));
 		}
 	}
 	
@@ -231,64 +177,34 @@ public class Game implements GameEvent
 		camera.x = playerBox.getX() - 40;
 	}
 	
-	private void countdownFinished()
-	{
-		this.gameConnection.send(Messages.StartRace.create(), true);
-		
-		startRace();
-	}
-	
-	private void leaderboardFinished()
-	{
-		this.gameConnection.send(Messages.RestartRace.create(), true);
-		
-		restartRace();
-	}
-	
 	private void restartRace()
 	{
 		this.gameStatus = GameStatus.READY;
+		
+		this.playerBox.restart();
+		
+		for (int i = 0, size = this.enemyBoxes.size(); i < size; i++)
+		{
+			EnemyBox box = this.enemyBoxes.valueAt(i);
+			box.restart();
+		}
 	}
 	
 	private void startRace()
 	{
+		this.gameScreen.showMessage("RACE STARTED");
+		
 		this.gameStatus = GameStatus.RUNNING;
 	}
 	
-	private void updateBoxPosition(SetPlayerBoxPosition setPlayerBoxPosition)
+	private void updateBoxPosition(PlayerBoxPosition setPlayerBoxPosition)
 	{
-		if (this.isServer)
-		{
-			Player player = getPlayerById(setPlayerBoxPosition.playerId);
-			
-			if (player != null)
-			{
-				this.gameConnection.send(player.macAddress, setPlayerBoxPosition.create(), true);
-			}
-		}
-		
 		EnemyBox box = this.enemyBoxes.get(setPlayerBoxPosition.playerId);
 		
 		if (box != null)
 		{
 			box.update(setPlayerBoxPosition.x, setPlayerBoxPosition.y, setPlayerBoxPosition.jumping);
 		}
-	}
-	
-	private Player getPlayerById(int id)
-	{
-		Player result = null;
-		
-		for (Player player : this.enemyPlayers)
-		{
-			if (player.id == id)
-			{
-				result = player;
-				break;
-			}
-		}
-		
-		return result;
 	}
 	
 	// ======================== LIFE CYCLE ====================== \\
@@ -319,8 +235,26 @@ public class Game implements GameEvent
 	// ========================= CONNECTION ======================
 	
 	@Override
+	public void onConnect()
+	{
+	}
+	
+	@Override
+	public void onErrorConnecting()
+	{
+	}
+	
+	@Override
+	public void onDisconnect()
+	{
+		this.gameScreen.onDisconnect();
+	}
+	
+	@Override
 	public void onReceive(byte[] message)
 	{
+		Log.e("TEST", "<<< RECEIVED: " + message[0]);
+		
 		if (message.length > 0)
 		{
 			MessageReader reader = new MessageReader(message);
@@ -336,22 +270,10 @@ public class Game implements GameEvent
 					restartRace();
 					break;
 				
-				case Messages.SetPlayerBoxPosition.CODE:
-					updateBoxPosition(new SetPlayerBoxPosition(reader));
+				case Messages.PlayerBoxPosition.CODE:
+					updateBoxPosition(new PlayerBoxPosition(reader));
 					break;
 			}
 		}
-	}
-	
-	@Override
-	public void playerDisconnect(String macAddress)
-	{
-		// TODO
-	}
-	
-	@Override
-	public void onDisconnect()
-	{
-		this.gameScreen.disconnected();
 	}
 }

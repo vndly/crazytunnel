@@ -4,11 +4,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.NumberPicker;
 import com.mauriciotogneri.crazytunnel.R;
 import com.mauriciotogneri.crazytunnel.activities.BaseFragment;
-import com.mauriciotogneri.crazytunnel.screens.lobby.LobbyServerScreen;
-import com.mauriciotogneri.crazytunnel.screens.lobby.ServerSelectionScreen;
+import com.mauriciotogneri.crazytunnel.screens.lobby.LobbyScreen;
 import com.mauriciotogneri.crazytunnel.shapes.Preferences;
 
 public class HomeScreen extends BaseFragment
@@ -16,102 +14,77 @@ public class HomeScreen extends BaseFragment
 	@Override
 	protected void onInitialize()
 	{
-		NumberPicker numberOfPlayers = findViewById(R.id.number_of_players);
-		numberOfPlayers.setMinValue(1);
-		numberOfPlayers.setMaxValue(6);
-		numberOfPlayers.setValue(4);
-		
-		NumberPicker numberOfLaps = findViewById(R.id.number_of_laps);
-		numberOfLaps.setMinValue(1);
-		numberOfLaps.setMaxValue(10);
-		numberOfLaps.setValue(3);
-		
-		Button createMatch = findViewById(R.id.create_game);
-		createMatch.setOnClickListener(new OnClickListener()
+		Button joinGame = findViewById(R.id.join_game);
+		joinGame.setOnClickListener(new OnClickListener()
 		{
 			@Override
 			public void onClick(View view)
 			{
-				createMatch();
-			}
-		});
-		
-		Button joinMatch = findViewById(R.id.join_game);
-		joinMatch.setOnClickListener(new OnClickListener()
-		{
-			@Override
-			public void onClick(View view)
-			{
-				joinMatch();
+				joinGame();
 			}
 		});
 		
 		EditText playerName = findViewById(R.id.player_name);
 		playerName.setText(Preferences.getPlayerName());
+		
+		EditText serverIP = findViewById(R.id.server_ip);
+		serverIP.setText(Preferences.getServerIP());
+		
+		EditText serverPort = findViewById(R.id.server_port);
+		serverPort.setText(String.valueOf(Preferences.getServerPort()));
 	}
 	
-	private void createMatch()
+	private void joinGame()
 	{
 		String playerName = getPlayerName();
+		String serverIP = getServerIP();
+		int serverPort = getServerPort();
 		
 		if (playerName.isEmpty())
 		{
 			showToast("MISSING NAME");
 		}
-		else
+		else if (serverIP.isEmpty())
 		{
-			Preferences.setPlayerName(playerName);
-			
-			int numberOfPlayers = getNumberOfPlayers();
-			int numberOfLaps = getNumberOfLaps();
-			
-			LobbyServerScreen lobbyServer = new LobbyServerScreen();
-			lobbyServer.setParameter(LobbyServerScreen.PARAMETER_PLAYER_NAME, playerName);
-			lobbyServer.setParameter(LobbyServerScreen.PARAMETER_NUMBER_OF_PLAYERS, numberOfPlayers);
-			lobbyServer.setParameter(LobbyServerScreen.PARAMETER_NUMBER_OF_LAPS, numberOfLaps);
-			openFragment(lobbyServer);
+			showToast("MISSING SERVER IP");
 		}
-	}
-	
-	private void joinMatch()
-	{
-		String playerName = getPlayerName();
-		
-		if (playerName.isEmpty())
+		else if (serverPort == 0)
 		{
-			showToast("MISSING NAME");
+			showToast("MISSING SERVER PORT");
 		}
 		else
 		{
 			Preferences.setPlayerName(playerName);
+			Preferences.setServerIP(serverIP);
+			Preferences.setServerPort(serverPort);
 			
-			ServerSelectionScreen serverSelection = new ServerSelectionScreen();
-			serverSelection.setParameter(ServerSelectionScreen.PARAMETER_PLAYER_NAME, playerName);
-			openFragment(serverSelection);
-			
+			LobbyScreen lobbyScreen = new LobbyScreen();
+			lobbyScreen.setParameter(LobbyScreen.PARAMETER_PLAYER_NAME, playerName);
+			lobbyScreen.setParameter(LobbyScreen.PARAMETER_SERVER_IP, serverIP);
+			lobbyScreen.setParameter(LobbyScreen.PARAMETER_SERVER_PORT, serverPort);
+			openFragment(lobbyScreen);
 		}
 	}
 	
 	private String getPlayerName()
 	{
 		EditText playerName = findViewById(R.id.player_name);
-		String result = playerName.getText().toString();
 		
-		return result;
+		return playerName.getText().toString();
 	}
 	
-	private int getNumberOfPlayers()
+	private String getServerIP()
 	{
-		NumberPicker numberOfPlayers = findViewById(R.id.number_of_players);
+		EditText serverIP = findViewById(R.id.server_ip);
 		
-		return numberOfPlayers.getValue();
+		return serverIP.getText().toString();
 	}
 	
-	private int getNumberOfLaps()
+	private int getServerPort()
 	{
-		NumberPicker numberOfLaps = findViewById(R.id.number_of_laps);
+		EditText serverIP = findViewById(R.id.server_port);
 		
-		return numberOfLaps.getValue();
+		return Integer.parseInt(serverIP.getText().toString());
 	}
 	
 	@Override
