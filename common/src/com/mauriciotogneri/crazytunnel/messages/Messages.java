@@ -3,26 +3,29 @@ package com.mauriciotogneri.crazytunnel.messages;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import com.mauriciotogneri.crazytunnel.Player;
+import com.mauriciotogneri.crazytunnel.objects.Player;
 
 public class Messages
 {
 	public static class PlayerConnect
 	{
 		public final String name;
+		public final int udpPort;
 		
 		public static final byte CODE = 1;
 		
 		public PlayerConnect(MessageReader reader)
 		{
 			this.name = reader.getString();
+			this.udpPort = reader.getInt();
 		}
 		
-		public static byte[] create(String name)
+		public static byte[] create(String name, int udpPort)
 		{
 			MessageWriter writer = new MessageWriter();
 			writer.putByte(PlayerConnect.CODE);
 			writer.putString(name);
+			writer.putInt(udpPort);
 			
 			return writer.getMessage();
 		}
@@ -33,6 +36,7 @@ public class Messages
 		public final byte id;
 		public final String name;
 		public final int color;
+		public final int udpPort;
 		
 		public static final byte CODE = 2;
 		
@@ -41,15 +45,17 @@ public class Messages
 			this.id = reader.getByte();
 			this.name = reader.getString();
 			this.color = reader.getInt();
+			this.udpPort = reader.getInt();
 		}
 		
-		public static byte[] create(byte id, String name, int color)
+		public static byte[] create(byte id, String name, int color, int udpPort)
 		{
 			MessageWriter writer = new MessageWriter();
 			writer.putByte(PlayerInfo.CODE);
 			writer.putByte(id);
 			writer.putString(name);
 			writer.putInt(color);
+			writer.putInt(udpPort);
 			
 			return writer.getMessage();
 		}

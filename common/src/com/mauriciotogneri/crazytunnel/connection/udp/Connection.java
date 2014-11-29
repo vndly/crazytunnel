@@ -9,7 +9,7 @@ import java.util.Arrays;
 public class Connection extends Thread
 {
 	private final DatagramSocket socket;
-	private final ConnectionEvent callback;
+	private ConnectionEvent callback;
 	private volatile boolean running = true;
 	
 	private static final int BUFFER_SIZE = 1024;
@@ -18,6 +18,22 @@ public class Connection extends Thread
 	{
 		this.socket = new DatagramSocket(port);
 		this.callback = callback;
+	}
+	
+	public Connection(ConnectionEvent callback) throws SocketException
+	{
+		this.socket = new DatagramSocket();
+		this.callback = callback;
+	}
+	
+	public void setCallback(ConnectionEvent callback)
+	{
+		this.callback = callback;
+	}
+	
+	public int getLocalPort()
+	{
+		return this.socket.getLocalPort();
 	}
 	
 	@Override

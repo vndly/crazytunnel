@@ -64,10 +64,13 @@ public class Server extends Thread
 	{
 		this.running = false;
 		closeServerSocket(this.serverSocket);
+		this.serverEvent.onFinished();
 	}
 	
 	public interface ServerEvent
 	{
 		void onConnected(Socket socket);
+		
+		void onFinished();
 	}
 }

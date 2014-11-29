@@ -1,4 +1,4 @@
-package com.mauriciotogneri.crazytunnel;
+package com.mauriciotogneri.crazytunnel.objects;
 
 public class Player
 {

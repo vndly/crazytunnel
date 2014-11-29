@@ -24,6 +24,11 @@ public class ClientConnection extends Thread
 		this.clientEvent = clientEvent;
 	}
 	
+	public InetAddress getRemoteAddress()
+	{
+		return this.socket.getInetAddress();
+	}
+	
 	public void setCallback(ClientConnectionEvent clientEvent)
 	{
 		this.clientEvent = clientEvent;

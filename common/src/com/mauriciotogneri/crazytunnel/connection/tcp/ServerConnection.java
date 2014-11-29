@@ -3,6 +3,7 @@ package com.mauriciotogneri.crazytunnel.connection.tcp;
 import java.io.Closeable;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Arrays;
 
@@ -20,9 +21,9 @@ public class ServerConnection extends Thread
 		this.serverEvent = serverEvent;
 	}
 	
-	public String getRemoteAddress()
+	public InetAddress getRemoteAddress()
 	{
-		return this.socket.getRemoteSocketAddress().toString();
+		return this.socket.getInetAddress();
 	}
 	
 	public boolean isConnected()
