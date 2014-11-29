@@ -177,7 +177,10 @@ public class Game implements ClientConnectionEvent, ConnectionEvent
 		{
 			this.lastInput = input.jump;
 			
-			ConnectionUtils.send(this.connection, this.clientConnection.getRemoteAddress(), this.udpPort, Messages.PlayerBoxPosition.create(player.id, box.getX(), box.getY(), input.jump));
+			byte[] message = Messages.PlayerBoxPosition.create(player.id, box.getX(), box.getY(), input.jump);
+			// ConnectionUtils.send(this.connection, this.clientConnection.getRemoteAddress(), this.udpPort,
+			// message);
+			ConnectionUtils.send(this.clientConnection, message);
 		}
 	}
 	
@@ -275,6 +278,10 @@ public class Game implements ClientConnectionEvent, ConnectionEvent
 				
 				case Messages.RestartRace.CODE:
 					restartRace();
+					break;
+				
+				case Messages.PlayerBoxPosition.CODE:
+					updateBoxPosition(new PlayerBoxPosition(reader));
 					break;
 			}
 		}
