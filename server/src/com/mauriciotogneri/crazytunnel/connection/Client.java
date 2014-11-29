@@ -6,6 +6,7 @@ import com.mauriciotogneri.crazytunnel.connection.tcp.ServerConnection;
 import com.mauriciotogneri.crazytunnel.connection.tcp.ServerConnection.ServerConnectionEvent;
 import com.mauriciotogneri.crazytunnel.messages.MessageReader;
 import com.mauriciotogneri.crazytunnel.messages.Messages;
+import com.mauriciotogneri.crazytunnel.messages.Messages.PlayerBoxPosition;
 import com.mauriciotogneri.crazytunnel.messages.Messages.PlayerConnect;
 import com.mauriciotogneri.crazytunnel.messages.Messages.PlayerInfo;
 import com.mauriciotogneri.crazytunnel.objects.Player;
@@ -59,6 +60,10 @@ public class Client implements ServerConnectionEvent
 				
 				case Messages.Ready.CODE:
 					this.game.processReady();
+					break;
+				
+				case Messages.PlayerBoxPosition.CODE:
+					this.game.processPlayerBoxPosition(this, new PlayerBoxPosition(reader));
 					break;
 			}
 		}
