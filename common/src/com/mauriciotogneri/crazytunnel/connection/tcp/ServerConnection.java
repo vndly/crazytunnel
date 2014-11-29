@@ -40,7 +40,7 @@ public class ServerConnection extends Thread
 				this.writer.write(message);
 				this.writer.flush();
 				
-				System.out.println(">>> " + getRemoteAddress() + " = " + Arrays.toString(message));
+				// System.out.println(">>> " + getRemoteAddress() + " = " + Arrays.toString(message));
 			}
 		}
 		catch (Exception e)
@@ -77,7 +77,8 @@ public class ServerConnection extends Thread
 					{
 						this.serverEvent.onReceive(Arrays.copyOfRange(buffer, 0, read));
 						
-						System.out.println("<<< " + getRemoteAddress() + " = " + Arrays.toString(Arrays.copyOfRange(buffer, 0, read)));
+						// System.out.println("<<< " + getRemoteAddress() + " = " +
+						// Arrays.toString(Arrays.copyOfRange(buffer, 0, read)));
 					}
 					catch (Exception e)
 					{
