@@ -246,7 +246,7 @@ public class Messages
 		{
 			this.playerName = reader.getString();
 			this.playerColor = reader.getInt();
-			this.time = reader.getInt();
+			this.time = reader.getFloat();
 		}
 		
 		public static byte[] create(String playerName, int playerColor, float time)
