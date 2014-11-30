@@ -58,9 +58,9 @@ public class RankingAdapter extends ArrayAdapter<RankingRow>
 		return convertView;
 	}
 	
-	private String formatTime(float time)
+	private String formatTime(double time)
 	{
-		float restTime = time;
+		double restTime = time;
 		
 		int minutes = (int)(restTime / 60);
 		restTime -= (minutes * 60);

@@ -38,7 +38,7 @@ public class Game implements ClientConnectionEvent, DatagramCommunicationEvent
 	
 	private final Camera camera;
 	
-	private float totalTime = 0;
+	private double totalTime = 0;
 	private final PlayerBox playerBox;
 	private final SparseArray<EnemyBox> enemyBoxes = new SparseArray<EnemyBox>();
 	
