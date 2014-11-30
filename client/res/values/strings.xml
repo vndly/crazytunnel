@@ -10,4 +10,6 @@
     
     <string name="client_lobby_title">Game lobby</string>
     
+    <string name="ranking_ready">READY</string>
+    
 </resources>

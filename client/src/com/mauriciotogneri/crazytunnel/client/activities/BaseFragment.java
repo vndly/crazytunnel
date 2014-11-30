@@ -50,6 +50,18 @@ public abstract class BaseFragment extends Fragment
 	{
 	}
 	
+	public void setVisibility(boolean value)
+	{
+		if (value)
+		{
+			this.layout.setVisibility(View.VISIBLE);
+		}
+		else
+		{
+			this.layout.setVisibility(View.INVISIBLE);
+		}
+	}
+	
 	public Vibrator getVibrator()
 	{
 		return this.baseActivity.getVibrator();

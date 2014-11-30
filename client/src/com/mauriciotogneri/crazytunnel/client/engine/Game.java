@@ -18,6 +18,7 @@ import com.mauriciotogneri.crazytunnel.client.util.ConnectionUtils;
 import com.mauriciotogneri.crazytunnel.common.messages.MessageReader;
 import com.mauriciotogneri.crazytunnel.common.messages.Messages;
 import com.mauriciotogneri.crazytunnel.common.messages.Messages.PlayerBoxPosition;
+import com.mauriciotogneri.crazytunnel.common.messages.Messages.RankingList;
 import com.mauriciotogneri.crazytunnel.common.network.DatagramCommunication;
 import com.mauriciotogneri.crazytunnel.common.network.DatagramCommunication.DatagramCommunicationEvent;
 import com.mauriciotogneri.crazytunnel.common.objects.Player;
@@ -37,6 +38,7 @@ public class Game implements ClientConnectionEvent, DatagramCommunicationEvent
 	
 	private final Camera camera;
 	
+	private float totalTime = 0;
 	private final PlayerBox playerBox;
 	private final SparseArray<EnemyBox> enemyBoxes = new SparseArray<EnemyBox>();
 	
@@ -70,7 +72,7 @@ public class Game implements ClientConnectionEvent, DatagramCommunicationEvent
 		this.camera = new Camera(Renderer.RESOLUTION_X, Renderer.RESOLUTION_Y);
 		
 		Vibrator vibrator = gameScreen.getVibrator();
-		LevelDefinition levelDefinition = getLevelDefinition(gameScreen.getContext(), R.raw.map4, laps);
+		LevelDefinition levelDefinition = getLevelDefinition(gameScreen.getContext(), R.raw.map_short, laps);
 		
 		this.level = new Level(this.camera, levelDefinition);
 		
@@ -123,6 +125,7 @@ public class Game implements ClientConnectionEvent, DatagramCommunicationEvent
 	
 	private void processRunning(float delta, InputEvent input)
 	{
+		this.totalTime += delta;
 		this.playerBox.update(delta, input);
 		
 		broadcastBoxPosition(this.player, this.playerBox, input);
@@ -134,7 +137,13 @@ public class Game implements ClientConnectionEvent, DatagramCommunicationEvent
 		
 		if (this.playerBox.finished())
 		{
+			this.gameStatus = GameStatus.FINISHED;
+			
+			this.gameScreen.displayRanking();
+			
 			// TODO: inform to server that player finished
+			ConnectionUtils.send(this.clientConnection, Messages.PlayerFinished.create(this.player.name, this.player.color, this.totalTime));
+			this.totalTime = 0;
 		}
 	}
 	
@@ -223,6 +232,11 @@ public class Game implements ClientConnectionEvent, DatagramCommunicationEvent
 		}
 	}
 	
+	private void processRankingList(RankingList rankingList)
+	{
+		this.gameScreen.updateRankingList(rankingList.ranking);
+	}
+	
 	// ======================== LIFE CYCLE ====================== \\
 	
 	public void pause(boolean finishing)
@@ -280,6 +294,10 @@ public class Game implements ClientConnectionEvent, DatagramCommunicationEvent
 			
 			case Messages.RestartRace.CODE:
 				restartRace();
+				break;
+			
+			case Messages.RankingList.CODE:
+				processRankingList(new RankingList(reader));
 				break;
 		}
 	}

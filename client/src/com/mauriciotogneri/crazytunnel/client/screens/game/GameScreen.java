@@ -7,13 +7,16 @@ import com.mauriciotogneri.crazytunnel.client.connection.ClientConnection;
 import com.mauriciotogneri.crazytunnel.client.engine.CustomSurfaceView;
 import com.mauriciotogneri.crazytunnel.client.engine.Game;
 import com.mauriciotogneri.crazytunnel.client.engine.Renderer;
+import com.mauriciotogneri.crazytunnel.client.screens.ranking.RankingScreen;
 import com.mauriciotogneri.crazytunnel.common.network.DatagramCommunication;
 import com.mauriciotogneri.crazytunnel.common.objects.Player;
+import com.mauriciotogneri.crazytunnel.common.objects.RankingRow;
 
 public class GameScreen extends BaseFragment
 {
 	private Game game;
 	private CustomSurfaceView screen;
+	private RankingScreen rankingScreen;
 	
 	public static final String PARAMETER_PLAYER = "player";
 	public static final String PARAMETER_ENEMIES = "enemies";
@@ -38,6 +41,34 @@ public class GameScreen extends BaseFragment
 		
 		this.screen = findViewById(R.id.glSurface);
 		this.screen.setRenderer(new Renderer(this.game, getContext(), this.screen));
+		
+		this.rankingScreen = new RankingScreen();
+		
+		openFragment(this.rankingScreen);
+	}
+	
+	public void displayRanking()
+	{
+		runOnUiThread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				GameScreen.this.rankingScreen.setVisibility(true);
+			}
+		});
+	}
+	
+	public void updateRankingList(final RankingRow[] ranking)
+	{
+		runOnUiThread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				GameScreen.this.rankingScreen.updateRankingList(ranking);
+			}
+		});
 	}
 	
 	public void onDisconnect()
