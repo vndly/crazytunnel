@@ -4,6 +4,8 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -186,7 +188,14 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 		{
 			this.ranking.add(new RankingRow(playerFinished.playerName, playerFinished.playerColor, playerFinished.time));
 			
-			// TODO: SORT LIST
+			Collections.sort(this.ranking, new Comparator<RankingRow>()
+			{
+				@Override
+				public int compare(RankingRow o1, RankingRow o2)
+				{
+					return (o1.time < o2.time) ? -1 : ((o1.time > o2.time) ? 1 : 0);
+				}
+			});
 			
 			sendAllPlayers(Messages.RankingList.create(this.ranking));
 		}
