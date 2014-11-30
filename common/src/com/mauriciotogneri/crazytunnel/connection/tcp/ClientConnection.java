@@ -17,6 +17,8 @@ public class ClientConnection extends Thread
 	private final int port;
 	private boolean isConnected = false;
 	
+	private static final int BUFFER_SIZE = 1024;
+	
 	public ClientConnection(String ip, int port, ClientConnectionEvent clientEvent)
 	{
 		this.ip = ip;
@@ -98,7 +100,7 @@ public class ClientConnection extends Thread
 				this.clientEvent.onConnect();
 				
 				int read = 0;
-				byte[] buffer = new byte[1024];
+				byte[] buffer = new byte[ClientConnection.BUFFER_SIZE];
 				
 				while ((read = this.reader.read(buffer)) != -1)
 				{

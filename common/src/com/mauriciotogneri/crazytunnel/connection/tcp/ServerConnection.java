@@ -15,6 +15,8 @@ public class ServerConnection extends Thread
 	private final Socket socket;
 	private boolean isConnected = true;
 	
+	private static final int BUFFER_SIZE = 1024;
+	
 	public ServerConnection(Socket socket, ServerConnectionEvent serverEvent)
 	{
 		this.socket = socket;
@@ -39,8 +41,6 @@ public class ServerConnection extends Thread
 			{
 				this.writer.write(message);
 				this.writer.flush();
-				
-				// System.out.println(">>> " + getRemoteAddress() + " = " + Arrays.toString(message));
 			}
 		}
 		catch (Exception e)
@@ -67,7 +67,7 @@ public class ServerConnection extends Thread
 			this.writer = this.socket.getOutputStream();
 			
 			int read = 0;
-			byte[] buffer = new byte[1024];
+			byte[] buffer = new byte[ServerConnection.BUFFER_SIZE];
 			
 			while ((read = this.reader.read(buffer)) != -1)
 			{
@@ -76,9 +76,6 @@ public class ServerConnection extends Thread
 					try
 					{
 						this.serverEvent.onReceive(Arrays.copyOfRange(buffer, 0, read));
-						
-						// System.out.println("<<< " + getRemoteAddress() + " = " +
-						// Arrays.toString(Arrays.copyOfRange(buffer, 0, read)));
 					}
 					catch (Exception e)
 					{
