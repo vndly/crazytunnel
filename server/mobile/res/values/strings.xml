@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Crazy Tunnel Server</string>
+    
+    <string name="main_players">Players:</string>
+    <string name="main_laps">Laps:</string>
+    <string name="main_start">Start</string>
+
+</resources>
