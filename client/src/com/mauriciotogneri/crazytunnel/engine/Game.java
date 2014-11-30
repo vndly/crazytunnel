@@ -36,6 +36,7 @@ public class Game implements ClientConnectionEvent, ConnectionEvent
 	
 	private final Camera camera;
 	
+	private final boolean lastInput = false;
 	private final PlayerBox playerBox;
 	private final SparseArray<EnemyBox> enemyBoxes = new SparseArray<EnemyBox>();
 	
@@ -99,8 +100,6 @@ public class Game implements ClientConnectionEvent, ConnectionEvent
 	}
 	
 	// ======================== UPDATE ====================== \\
-	
-	private boolean lastInput = false;
 	
 	public void update(float delta, InputEvent input, Renderer renderer)
 	{
@@ -173,15 +172,14 @@ public class Game implements ClientConnectionEvent, ConnectionEvent
 	
 	private void broadcastBoxPosition(Player player, PlayerBox box, InputEvent input)
 	{
-		if (this.lastInput != input.jump)
-		{
-			this.lastInput = input.jump;
-			
-			byte[] message = Messages.PlayerBoxPosition.create(player.id, box.getX(), box.getY(), input.jump);
-			// ConnectionUtils.send(this.connection, this.clientConnection.getRemoteAddress(), this.udpPort,
-			// message);
-			ConnectionUtils.send(this.clientConnection, message);
-		}
+		// if (this.lastInput != input.jump)
+		// {
+		// this.lastInput = input.jump;
+		
+		ConnectionUtils.send(this.connection, this.clientConnection.getRemoteAddress(), this.udpPort, Messages.PlayerBoxPosition.create(player.id, box.getX(), box.getY(), input.jump));
+		
+		// ConnectionUtils.send(this.clientConnection, message);
+		// }
 	}
 	
 	private void focusCamera(Camera camera, PlayerBox playerBox)
@@ -204,8 +202,6 @@ public class Game implements ClientConnectionEvent, ConnectionEvent
 	
 	private void startRace()
 	{
-		this.gameScreen.showMessage("RACE STARTED");
-		
 		this.gameStatus = GameStatus.RUNNING;
 	}
 	
