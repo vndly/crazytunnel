@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 import com.mauriciotogneri.crazytunnel.common.messages.MessageReader;
 import com.mauriciotogneri.crazytunnel.common.messages.Messages;
-import com.mauriciotogneri.crazytunnel.common.messages.Messages.PlayerBoxPosition;
 import com.mauriciotogneri.crazytunnel.common.messages.Messages.PlayerConnect;
 import com.mauriciotogneri.crazytunnel.common.network.DatagramCommunication;
 import com.mauriciotogneri.crazytunnel.common.network.DatagramCommunication.DatagramCommunicationEvent;
@@ -170,11 +169,6 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 		}
 	}
 	
-	public void processPlayerBoxPosition(Client client, PlayerBoxPosition playerBoxPosition)
-	{
-		sendAllPlayers(client, playerBoxPosition.create());
-	}
-	
 	public void sendPlayerList()
 	{
 		sendAllPlayers(Messages.PlayersList.create(this.registeredPlayers.values()));
@@ -245,5 +239,4 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 		
 		void onClientDisconnect(InetAddress address);
 	}
-	
 }
