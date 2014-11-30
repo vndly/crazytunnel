@@ -1,7 +1,10 @@
 package com.mauriciotogneri.crazytunnel.server.connection;
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Enumeration;
 
 public class Server extends Thread
 {
@@ -23,11 +26,13 @@ public class Server extends Thread
 		{
 			this.serverSocket = new ServerSocket(this.port);
 			
+			this.serverEvent.onConnected(getAddress(), this.port);
+			
 			while (this.running)
 			{
 				try
 				{
-					this.serverEvent.onConnected(this.serverSocket.accept());
+					this.serverEvent.onClientConnected(this.serverSocket.accept());
 				}
 				catch (Exception e)
 				{
@@ -43,6 +48,37 @@ public class Server extends Thread
 		{
 			finish();
 		}
+	}
+	
+	private InetAddress getAddress()
+	{
+		InetAddress result = null;
+		
+		try
+		{
+			for (Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces(); interfaces.hasMoreElements();)
+			{
+				NetworkInterface networkInterface = interfaces.nextElement();
+				
+				for (Enumeration<InetAddress> addresses = networkInterface.getInetAddresses(); addresses.hasMoreElements();)
+				{
+					InetAddress address = addresses.nextElement();
+					
+					if ((!address.isLoopbackAddress()) && (address.isSiteLocalAddress()))
+					{
+						return address;
+					}
+				}
+			}
+			
+			result = InetAddress.getLocalHost();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		return result;
 	}
 	
 	private void closeServerSocket(ServerSocket socket)
@@ -69,7 +105,9 @@ public class Server extends Thread
 	
 	public interface ServerEvent
 	{
-		void onConnected(Socket socket);
+		void onConnected(InetAddress address, int port);
+		
+		void onClientConnected(Socket socket);
 		
 		void onFinished();
 	}

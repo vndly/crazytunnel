@@ -3,12 +3,20 @@ package com.mauriciotogneri.crazytunnel.server.main;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
 import java.util.Properties;
 import com.mauriciotogneri.crazytunnel.server.connection.Game;
+import com.mauriciotogneri.crazytunnel.server.connection.Game.GameEvent;
 
-public class CrazyTunnelServer
+public class CrazyTunnelServer implements GameEvent
 {
 	public static void main(String[] args)
+	{
+		CrazyTunnelServer crazyTunnelServer = new CrazyTunnelServer();
+		crazyTunnelServer.start(args);
+	}
+	
+	public void start(String[] args)
 	{
 		try
 		{
@@ -20,7 +28,7 @@ public class CrazyTunnelServer
 				int players = Integer.parseInt(properties.getProperty("players"));
 				int laps = Integer.parseInt(properties.getProperty("laps"));
 				
-				Game game = new Game(port, players, laps);
+				Game game = new Game(this, port, players, laps);
 				game.start();
 			}
 			else
@@ -56,4 +64,21 @@ public class CrazyTunnelServer
 		return result;
 	}
 	
+	@Override
+	public void onClientConnected(InetAddress address)
+	{
+		System.out.println("NEW CONNECTION: " + address.getHostAddress());
+	}
+	
+	@Override
+	public void onClientDisconnect(InetAddress address)
+	{
+		System.out.println("CLIENT DISCONNECTED: " + address.getHostAddress());
+	}
+	
+	@Override
+	public void onConnected(InetAddress address, int port)
+	{
+		System.out.println("SERVER STARTED: " + address + ":" + port);
+	}
 }

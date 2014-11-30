@@ -1,10 +1,8 @@
 package com.mauriciotogneri.crazytunnel.server.connection;
 
-import java.awt.Color;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,11 +14,13 @@ import com.mauriciotogneri.crazytunnel.common.messages.Messages.PlayerBoxPositio
 import com.mauriciotogneri.crazytunnel.common.messages.Messages.PlayerConnect;
 import com.mauriciotogneri.crazytunnel.common.network.DatagramCommunication;
 import com.mauriciotogneri.crazytunnel.common.network.DatagramCommunication.DatagramCommunicationEvent;
+import com.mauriciotogneri.crazytunnel.common.objects.Color;
 import com.mauriciotogneri.crazytunnel.common.objects.Player;
 import com.mauriciotogneri.crazytunnel.server.connection.Server.ServerEvent;
 
 public class Game implements ServerEvent, DatagramCommunicationEvent
 {
+	private final GameEvent gameEvent;
 	private final Server server;
 	private final DatagramCommunication datagramCommunication;
 	
@@ -37,29 +37,21 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 	private final int numberOfPlayers;
 	private final int numberOfLaps;
 	
-	public Game(int port, int numberOfPlayers, int numberOfLaps) throws SocketException
+	public Game(GameEvent gameEvent, int port, int numberOfPlayers, int numberOfLaps) throws SocketException
 	{
+		this.gameEvent = gameEvent;
 		this.server = new Server(this, port);
 		this.datagramCommunication = new DatagramCommunication(this);
 		
 		this.numberOfPlayers = numberOfPlayers;
 		this.numberOfLaps = numberOfLaps;
 		
-		this.colorIndex.add(new Color(60, 170, 230, 255).getRGB());
-		this.colorIndex.add(new Color(255, 60, 60, 255).getRGB());
-		this.colorIndex.add(new Color(100, 200, 100, 255).getRGB());
-		this.colorIndex.add(new Color(255, 200, 40, 255).getRGB());
-		this.colorIndex.add(new Color(230, 110, 240, 255).getRGB());
-		this.colorIndex.add(new Color(130, 230, 230, 255).getRGB());
-		
-		try
-		{
-			log("SERVER STARTED: " + InetAddress.getLocalHost() + ":" + port);
-		}
-		catch (UnknownHostException e)
-		{
-			e.printStackTrace();
-		}
+		this.colorIndex.add(Color.getColor(60, 170, 230, 255));
+		this.colorIndex.add(Color.getColor(255, 60, 60, 255));
+		this.colorIndex.add(Color.getColor(100, 200, 100, 255));
+		this.colorIndex.add(Color.getColor(255, 200, 40, 255));
+		this.colorIndex.add(Color.getColor(230, 110, 240, 255));
+		this.colorIndex.add(Color.getColor(130, 230, 230, 255));
 	}
 	
 	public void start()
@@ -74,9 +66,9 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 	}
 	
 	@Override
-	public void onConnected(Socket socket)
+	public void onClientConnected(Socket socket)
 	{
-		log("NEW CONNECTION: " + socket.getInetAddress().getHostAddress());
+		this.gameEvent.onClientConnected(socket.getInetAddress());
 		
 		Client client = new Client(this, socket);
 		client.start();
@@ -90,7 +82,7 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 	
 	public void clientDisconnect(Client client)
 	{
-		log("CLIENT DISCONNECTED: " + client.getRemoteAddress().getHostAddress());
+		this.gameEvent.onClientDisconnect(client.getRemoteAddress());
 		
 		this.registeredPlayers.remove(client);
 	}
@@ -237,8 +229,18 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 		}
 	}
 	
-	private void log(String message)
+	public interface GameEvent
 	{
-		System.out.println(message);
+		void onConnected(InetAddress address, int port);
+		
+		void onClientConnected(InetAddress address);
+		
+		void onClientDisconnect(InetAddress address);
+	}
+	
+	@Override
+	public void onConnected(InetAddress address, int port)
+	{
+		this.gameEvent.onConnected(address, port);
 	}
 }
