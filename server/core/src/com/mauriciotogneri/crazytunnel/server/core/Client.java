@@ -5,6 +5,7 @@ import java.net.Socket;
 import com.mauriciotogneri.crazytunnel.common.messages.MessageReader;
 import com.mauriciotogneri.crazytunnel.common.messages.Messages;
 import com.mauriciotogneri.crazytunnel.common.messages.Messages.PlayerConnect;
+import com.mauriciotogneri.crazytunnel.common.messages.Messages.PlayerFinished;
 import com.mauriciotogneri.crazytunnel.common.messages.Messages.PlayerInfo;
 import com.mauriciotogneri.crazytunnel.common.objects.Player;
 import com.mauriciotogneri.crazytunnel.server.core.ServerConnection.ServerConnectionEvent;
@@ -56,6 +57,10 @@ public class Client implements ServerConnectionEvent
 			
 			case Messages.Ready.CODE:
 				this.game.processReady();
+				break;
+			
+			case Messages.PlayerFinished.CODE:
+				this.game.processPlayerFinished(new PlayerFinished(reader));
 				break;
 		}
 	}

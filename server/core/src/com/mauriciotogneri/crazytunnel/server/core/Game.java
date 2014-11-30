@@ -11,10 +11,12 @@ import java.util.Set;
 import com.mauriciotogneri.crazytunnel.common.messages.MessageReader;
 import com.mauriciotogneri.crazytunnel.common.messages.Messages;
 import com.mauriciotogneri.crazytunnel.common.messages.Messages.PlayerConnect;
+import com.mauriciotogneri.crazytunnel.common.messages.Messages.PlayerFinished;
 import com.mauriciotogneri.crazytunnel.common.network.DatagramCommunication;
 import com.mauriciotogneri.crazytunnel.common.network.DatagramCommunication.DatagramCommunicationEvent;
 import com.mauriciotogneri.crazytunnel.common.objects.Color;
 import com.mauriciotogneri.crazytunnel.common.objects.Player;
+import com.mauriciotogneri.crazytunnel.common.objects.RankingRow;
 import com.mauriciotogneri.crazytunnel.server.core.Server.ServerEvent;
 
 public class Game implements ServerEvent, DatagramCommunicationEvent
@@ -32,6 +34,8 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 	private final List<Integer> colorIndex = new ArrayList<Integer>();
 	
 	private final Map<Client, Player> registeredPlayers = new HashMap<Client, Player>();
+	
+	private final List<RankingRow> ranking = new ArrayList<RankingRow>();
 	
 	private final int numberOfPlayers;
 	private final int numberOfLaps;
@@ -147,6 +151,11 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 			}
 			
 			sendStartGame();
+			
+			synchronized (this.ranking)
+			{
+				this.ranking.clear();
+			}
 		}
 	}
 	
@@ -166,6 +175,20 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 			}
 			
 			sendStartRace();
+			
+			this.playersReady = 0;
+		}
+	}
+	
+	public void processPlayerFinished(PlayerFinished playerFinished)
+	{
+		synchronized (this.ranking)
+		{
+			this.ranking.add(new RankingRow(playerFinished.playerName, playerFinished.playerColor, playerFinished.time));
+			
+			// TODO: SORT LIST
+			
+			sendAllPlayers(Messages.RankingList.create(this.ranking));
 		}
 	}
 	
