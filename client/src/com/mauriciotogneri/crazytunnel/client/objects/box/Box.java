@@ -15,8 +15,10 @@ public class Box
 	private final float initialX;
 	private final float initialY;
 	
-	protected final Sprite sprite;
-	protected float acceleration = 0;
+	private final Sprite sprite;
+	private float acceleration = 0;
+	
+	private final Object lock = new Object();
 	
 	private static final float SLOW_RATIO = 1f; // 0.2f;
 	
@@ -48,6 +50,11 @@ public class Box
 		this.sprite.y = this.initialY;
 	}
 	
+	protected void jump()
+	{
+		this.acceleration += Box.JUMP_FORCE;
+	}
+	
 	protected void updatePosition(float delta)
 	{
 		this.acceleration -= Box.GRAVITY;
@@ -61,16 +68,19 @@ public class Box
 			this.acceleration = -Box.MAX_ACCELERATION_DOWN;
 		}
 		
-		this.sprite.x += delta * getSpeed();
-		this.sprite.y += delta * this.acceleration;
-		
-		if (this.sprite.y < 0)
+		synchronized (this.lock)
 		{
-			this.sprite.y = 0;
-		}
-		else if (this.sprite.y > (Renderer.RESOLUTION_Y - Box.SIZE))
-		{
-			this.sprite.y = Renderer.RESOLUTION_Y - Box.SIZE;
+			this.sprite.x += delta * getSpeed();
+			this.sprite.y += delta * this.acceleration;
+			
+			if (this.sprite.y < 0)
+			{
+				this.sprite.y = 0;
+			}
+			else if (this.sprite.y > (Renderer.RESOLUTION_Y - Box.SIZE))
+			{
+				this.sprite.y = Renderer.RESOLUTION_Y - Box.SIZE;
+			}
 		}
 	}
 	
@@ -81,12 +91,30 @@ public class Box
 	
 	public float getX()
 	{
-		return this.sprite.x;
+		synchronized (this.lock)
+		{
+			return this.sprite.x;
+		}
 	}
 	
 	public float getY()
 	{
-		return this.sprite.y;
+		synchronized (this.lock)
+		{
+			return this.sprite.y;
+		}
+	}
+	
+	protected void updatePosition(float x, float y)
+	{
+		synchronized (this.lock)
+		{
+			if (x > this.sprite.x)
+			{
+				this.sprite.x = x;
+				this.sprite.y = y;
+			}
+		}
 	}
 	
 	protected boolean collide()
@@ -108,9 +136,12 @@ public class Box
 	
 	public void render(Renderer renderer)
 	{
-		if (this.camera.isInside(this.sprite))
+		synchronized (this.lock)
 		{
-			this.sprite.render(renderer);
+			if (this.camera.isInside(this.sprite))
+			{
+				this.sprite.render(renderer);
+			}
 		}
 	}
 }

@@ -18,7 +18,7 @@ public class EnemyBox extends Box
 		{
 			if (this.jumping)
 			{
-				this.acceleration += Box.JUMP_FORCE;
+				jump();
 			}
 			
 			updatePosition(delta);
@@ -35,8 +35,8 @@ public class EnemyBox extends Box
 	
 	public void update(float x, float y, boolean jumping)
 	{
-		this.sprite.x = x;
-		this.sprite.y = y;
 		this.jumping = jumping;
+		
+		updatePosition(x, y);
 	}
 }

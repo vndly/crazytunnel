@@ -24,7 +24,7 @@ public class PlayerBox extends Box
 		{
 			if (input.jump)
 			{
-				this.acceleration += Box.JUMP_FORCE;
+				jump();
 			}
 			
 			updatePosition(delta);

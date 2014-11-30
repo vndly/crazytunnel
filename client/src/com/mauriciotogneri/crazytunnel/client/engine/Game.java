@@ -27,6 +27,7 @@ public class Game implements ClientConnectionEvent, DatagramCommunicationEvent
 	private final GameScreen gameScreen;
 	private Renderer renderer;
 	
+	private final InetAddress udpAddress;
 	private final int udpPort;
 	private final DatagramCommunication connection;
 	private final ClientConnection clientConnection;
@@ -60,6 +61,8 @@ public class Game implements ClientConnectionEvent, DatagramCommunicationEvent
 		
 		this.clientConnection = clientConnection;
 		this.clientConnection.setCallback(this);
+		
+		this.udpAddress = this.clientConnection.getRemoteAddress();
 		
 		this.player = player;
 		this.enemies = enemies;
@@ -121,12 +124,12 @@ public class Game implements ClientConnectionEvent, DatagramCommunicationEvent
 	private void processRunning(float delta, InputEvent input)
 	{
 		this.playerBox.update(delta, input);
+		
 		broadcastBoxPosition(this.player, this.playerBox, input);
 		
 		for (int i = 0, size = this.enemyBoxes.size(); i < size; i++)
 		{
-			EnemyBox box = this.enemyBoxes.valueAt(i);
-			box.update(delta);
+			this.enemyBoxes.valueAt(i).update(delta);
 		}
 		
 		if (this.playerBox.finished())
@@ -169,18 +172,6 @@ public class Game implements ClientConnectionEvent, DatagramCommunicationEvent
 		playerBox.render(renderer);
 	}
 	
-	private void broadcastBoxPosition(Player player, PlayerBox box, InputEvent input)
-	{
-		// if (this.lastInput != input.jump)
-		// {
-		// this.lastInput = input.jump;
-		
-		ConnectionUtils.send(this.connection, this.clientConnection.getRemoteAddress(), this.udpPort, Messages.PlayerBoxPosition.create(player.id, box.getX(), box.getY(), input.jump));
-		
-		// ConnectionUtils.send(this.clientConnection, message);
-		// }
-	}
-	
 	private void focusCamera(Camera camera, PlayerBox playerBox)
 	{
 		camera.x = playerBox.getX() - 40;
@@ -204,13 +195,31 @@ public class Game implements ClientConnectionEvent, DatagramCommunicationEvent
 		this.gameStatus = GameStatus.RUNNING;
 	}
 	
-	private void updateBoxPosition(PlayerBoxPosition setPlayerBoxPosition)
+	private void broadcastBoxPosition(Player player, PlayerBox box, InputEvent input)
 	{
-		EnemyBox box = this.enemyBoxes.get(setPlayerBoxPosition.playerId);
+		// if (this.lastInput != input.jump)
+		// {
+		// this.lastInput = input.jump;
+		
+		ConnectionUtils.send(this.connection, this.udpAddress, this.udpPort, Messages.PlayerBoxPosition.create(player.id, box.getX(), box.getY(), input.jump));
+		
+		// ConnectionUtils.send(this.clientConnection, message);
+		// }
+	}
+	
+	// private long lastTime = (System.nanoTime() / 1000000);
+	
+	private void updateBoxPosition(PlayerBoxPosition playerBoxPosition)
+	{
+		// long now = (System.nanoTime() / 1000000);
+		// System.out.println("TEST " + (now - this.lastTime) + " = " + playerBoxPosition.x);
+		// this.lastTime = now;
+		
+		EnemyBox box = this.enemyBoxes.get(playerBoxPosition.playerId);
 		
 		if (box != null)
 		{
-			box.update(setPlayerBoxPosition.x, setPlayerBoxPosition.y, setPlayerBoxPosition.jumping);
+			box.update(playerBoxPosition.x, playerBoxPosition.y, playerBoxPosition.jumping);
 		}
 	}
 	
@@ -271,10 +280,6 @@ public class Game implements ClientConnectionEvent, DatagramCommunicationEvent
 			
 			case Messages.RestartRace.CODE:
 				restartRace();
-				break;
-			
-			case Messages.PlayerBoxPosition.CODE:
-				updateBoxPosition(new PlayerBoxPosition(reader));
 				break;
 		}
 	}
