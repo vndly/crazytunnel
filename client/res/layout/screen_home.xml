@@ -22,7 +22,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:inputType="text"
+            android:inputType="textCapSentences"
             android:lines="1"
             android:maxLines="1"
             android:singleLine="true" />
@@ -64,10 +64,10 @@
             android:id="@+id/server_port"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ems="4"
+            android:ems="5"
             android:inputType="number"
             android:lines="1"
-            android:maxLength="4"
+            android:maxLength="5"
             android:maxLines="1"
             android:singleLine="true" />
         
