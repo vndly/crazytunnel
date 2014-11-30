@@ -30,7 +30,7 @@ public class Box
 	private static final float MAX_ACCELERATION_UP = 30 * Box.SLOW_RATIO;
 	private static final float MAX_ACCELERATION_DOWN = 30 * Box.SLOW_RATIO;
 	
-	private static final int SIZE = 5;
+	private static final int SIZE = 4;
 	
 	public Box(Camera camera, Level level, float x, float y, int color)
 	{

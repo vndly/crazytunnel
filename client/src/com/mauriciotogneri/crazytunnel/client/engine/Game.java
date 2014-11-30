@@ -70,7 +70,7 @@ public class Game implements ClientConnectionEvent, DatagramCommunicationEvent
 		this.camera = new Camera(Renderer.RESOLUTION_X, Renderer.RESOLUTION_Y);
 		
 		Vibrator vibrator = gameScreen.getVibrator();
-		LevelDefinition levelDefinition = getLevelDefinition(gameScreen.getContext(), R.raw.map, laps);
+		LevelDefinition levelDefinition = getLevelDefinition(gameScreen.getContext(), R.raw.map4, laps);
 		
 		this.level = new Level(this.camera, levelDefinition);
 		
