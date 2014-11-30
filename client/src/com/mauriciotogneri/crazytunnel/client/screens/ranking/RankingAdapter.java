@@ -43,6 +43,22 @@ public class RankingAdapter extends ArrayAdapter<RankingRow>
 		name.setText(rankingRow.playerName);
 		name.setTextColor(rankingRow.playerColor);
 		
+		TextView time = (TextView)convertView.findViewById(R.id.time);
+		time.setText(RankingAdapter.formatTime(rankingRow.time));
+		
 		return convertView;
+	}
+	
+	private static String formatTime(float time)
+	{
+		float restTime = time;
+		
+		int minutes = (int)(restTime / 60);
+		restTime -= (minutes * 60);
+		
+		int seconds = (int)Math.floor(restTime);
+		restTime -= seconds;
+		
+		return ((minutes < 10) ? ("0" + minutes) : minutes) + ":" + ((seconds < 10) ? ("0" + seconds) : seconds) + ":" + ((int)(restTime * 1000));
 	}
 }
