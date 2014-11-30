@@ -55,8 +55,7 @@ public class Game implements ServerEvent, ConnectionEvent
 		
 		try
 		{
-			log("TCP: " + InetAddress.getLocalHost() + ":" + port);
-			log("UDP: " + InetAddress.getLocalHost() + ":" + this.connection.getLocalPort());
+			log("SERVER STARTED: " + InetAddress.getLocalHost() + ":" + port);
 		}
 		catch (UnknownHostException e)
 		{
@@ -87,7 +86,7 @@ public class Game implements ServerEvent, ConnectionEvent
 	@Override
 	public void onFinished()
 	{
-		// TODO
+		System.err.println("SERVER FINISHED");
 	}
 	
 	public void clientDisconnect(Client client)
@@ -244,6 +243,6 @@ public class Game implements ServerEvent, ConnectionEvent
 	
 	private void log(String message)
 	{
-		// System.out.println(message);
+		System.out.println(message);
 	}
 }
