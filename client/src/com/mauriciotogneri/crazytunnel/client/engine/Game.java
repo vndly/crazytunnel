@@ -91,7 +91,7 @@ public class Game implements ClientConnectionEvent, DatagramCommunicationEvent
 		{
 			this.renderer = renderer;
 			
-			ConnectionUtils.send(this.clientConnection, Messages.Ready.create());
+			restartRace();
 		}
 	}
 	
@@ -137,32 +137,15 @@ public class Game implements ClientConnectionEvent, DatagramCommunicationEvent
 		
 		if (this.playerBox.finished())
 		{
+			this.playerBox.pause();
+			
 			this.gameStatus = GameStatus.FINISHED;
 			
 			this.gameScreen.displayRanking();
 			
-			// TODO: inform to server that player finished
 			ConnectionUtils.send(this.clientConnection, Messages.PlayerFinished.create(this.player.name, this.player.color, this.totalTime));
 			this.totalTime = 0;
 		}
-	}
-	
-	private boolean enemiesFinished(SparseArray<EnemyBox> enemyBoxes)
-	{
-		boolean result = true;
-		
-		for (int i = 0, size = enemyBoxes.size(); i < size; i++)
-		{
-			EnemyBox box = enemyBoxes.valueAt(i);
-			
-			if (!box.finished())
-			{
-				result = false;
-				break;
-			}
-		}
-		
-		return result;
 	}
 	
 	private void render(Renderer renderer, Camera camera, Level level, PlayerBox playerBox, SparseArray<EnemyBox> enemyBoxes)
@@ -186,7 +169,7 @@ public class Game implements ClientConnectionEvent, DatagramCommunicationEvent
 		camera.x = playerBox.getX() - 40;
 	}
 	
-	private void restartRace()
+	public void restartRace()
 	{
 		this.gameStatus = GameStatus.READY;
 		
@@ -197,6 +180,8 @@ public class Game implements ClientConnectionEvent, DatagramCommunicationEvent
 			EnemyBox box = this.enemyBoxes.valueAt(i);
 			box.restart();
 		}
+		
+		ConnectionUtils.send(this.clientConnection, Messages.Ready.create());
 	}
 	
 	private void startRace()
@@ -234,7 +219,7 @@ public class Game implements ClientConnectionEvent, DatagramCommunicationEvent
 	
 	private void processRankingList(RankingList rankingList)
 	{
-		this.gameScreen.updateRankingList(rankingList.ranking);
+		this.gameScreen.updateRankingList(rankingList.ranking, rankingList.ranking.length == (this.enemies.size() + 1));
 	}
 	
 	// ======================== LIFE CYCLE ====================== \\

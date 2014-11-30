@@ -44,6 +44,7 @@ public class GameScreen extends BaseFragment
 		
 		this.rankingScreen = new RankingScreen();
 		
+		this.rankingScreen.setParameter(RankingScreen.PARAMETER_GAME_SCREEN, this);
 		openFragment(this.rankingScreen);
 	}
 	
@@ -59,16 +60,23 @@ public class GameScreen extends BaseFragment
 		});
 	}
 	
-	public void updateRankingList(final RankingRow[] ranking)
+	public void updateRankingList(final RankingRow[] ranking, final boolean enableReady)
 	{
 		runOnUiThread(new Runnable()
 		{
 			@Override
 			public void run()
 			{
-				GameScreen.this.rankingScreen.updateRankingList(ranking);
+				GameScreen.this.rankingScreen.updateRankingList(ranking, enableReady);
 			}
 		});
+	}
+	
+	public void playerReady()
+	{
+		GameScreen.this.rankingScreen.setVisibility(false);
+		
+		this.game.restartRace();
 	}
 	
 	public void onDisconnect()
