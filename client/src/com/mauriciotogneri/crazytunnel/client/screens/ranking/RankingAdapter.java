@@ -1,5 +1,6 @@
 package com.mauriciotogneri.crazytunnel.client.screens.ranking;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -44,12 +45,12 @@ public class RankingAdapter extends ArrayAdapter<RankingRow>
 		name.setTextColor(rankingRow.playerColor);
 		
 		TextView time = (TextView)convertView.findViewById(R.id.time);
-		time.setText(RankingAdapter.formatTime(rankingRow.time));
+		time.setText(formatTime(rankingRow.time));
 		
 		return convertView;
 	}
 	
-	private static String formatTime(float time)
+	private String formatTime(float time)
 	{
 		float restTime = time;
 		
@@ -59,6 +60,23 @@ public class RankingAdapter extends ArrayAdapter<RankingRow>
 		int seconds = (int)Math.floor(restTime);
 		restTime -= seconds;
 		
-		return ((minutes < 10) ? ("0" + minutes) : minutes) + ":" + ((seconds < 10) ? ("0" + seconds) : seconds) + ":" + ((int)(restTime * 1000));
+		return format(minutes, "00") + ":" + format(seconds, "00") + ":" + format(restTime * 1000, "000");
+	}
+	
+	private String format(double value, String format)
+	{
+		String result = "";
+		
+		try
+		{
+			DecimalFormat formatter = new DecimalFormat(format);
+			result = formatter.format(value);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		return result;
 	}
 }

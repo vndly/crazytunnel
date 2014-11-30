@@ -65,7 +65,7 @@ public abstract class BaseActivity extends FragmentActivity
 	{
 		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 		transaction.add(getContainerId(), fragment);
-		// transaction.hide(getCurrentFragment());
+		transaction.hide(getCurrentFragment());
 		transaction.commit();
 		
 		this.fragments.push(fragment);

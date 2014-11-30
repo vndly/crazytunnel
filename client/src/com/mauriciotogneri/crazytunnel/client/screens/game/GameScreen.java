@@ -1,13 +1,19 @@
 package com.mauriciotogneri.crazytunnel.client.screens.game;
 
+import java.util.ArrayList;
 import java.util.List;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import com.mauriciotogneri.crazytunnel.client.R;
 import com.mauriciotogneri.crazytunnel.client.activities.BaseFragment;
 import com.mauriciotogneri.crazytunnel.client.connection.ClientConnection;
 import com.mauriciotogneri.crazytunnel.client.engine.CustomSurfaceView;
 import com.mauriciotogneri.crazytunnel.client.engine.Game;
 import com.mauriciotogneri.crazytunnel.client.engine.Renderer;
-import com.mauriciotogneri.crazytunnel.client.screens.ranking.RankingScreen;
+import com.mauriciotogneri.crazytunnel.client.screens.ranking.RankingAdapter;
 import com.mauriciotogneri.crazytunnel.common.network.DatagramCommunication;
 import com.mauriciotogneri.crazytunnel.common.objects.Player;
 import com.mauriciotogneri.crazytunnel.common.objects.RankingRow;
@@ -16,7 +22,7 @@ public class GameScreen extends BaseFragment
 {
 	private Game game;
 	private CustomSurfaceView screen;
-	private RankingScreen rankingScreen;
+	private RankingAdapter rankingAdapter;
 	
 	public static final String PARAMETER_PLAYER = "player";
 	public static final String PARAMETER_ENEMIES = "enemies";
@@ -28,6 +34,22 @@ public class GameScreen extends BaseFragment
 	@Override
 	protected void onInitialize()
 	{
+		this.rankingAdapter = new RankingAdapter(getContext(), new ArrayList<RankingRow>());
+		
+		ListView listView = (ListView)findViewById(R.id.ranking_list);
+		listView.setAdapter(this.rankingAdapter);
+		
+		final Button ready = findViewById(R.id.ready);
+		ready.setOnClickListener(new OnClickListener()
+		{
+			@Override
+			public void onClick(View view)
+			{
+				playerReady();
+				ready.setVisibility(View.INVISIBLE);
+			}
+		});
+		
 		Player player = getParameter(GameScreen.PARAMETER_PLAYER);
 		List<Player> enemies = getParameter(GameScreen.PARAMETER_ENEMIES);
 		
@@ -41,11 +63,6 @@ public class GameScreen extends BaseFragment
 		
 		this.screen = findViewById(R.id.glSurface);
 		this.screen.setRenderer(new Renderer(this.game, getContext(), this.screen));
-		
-		this.rankingScreen = new RankingScreen();
-		
-		this.rankingScreen.setParameter(RankingScreen.PARAMETER_GAME_SCREEN, this);
-		openFragment(this.rankingScreen);
 	}
 	
 	public void displayRanking()
@@ -55,7 +72,7 @@ public class GameScreen extends BaseFragment
 			@Override
 			public void run()
 			{
-				GameScreen.this.rankingScreen.setVisibility(true);
+				displayRankingScreen(true);
 			}
 		});
 	}
@@ -67,16 +84,48 @@ public class GameScreen extends BaseFragment
 			@Override
 			public void run()
 			{
-				GameScreen.this.rankingScreen.updateRankingList(ranking, enableReady);
+				update(ranking, enableReady);
 			}
 		});
 	}
 	
+	private void update(RankingRow[] rankingList, final boolean enableReady)
+	{
+		this.rankingAdapter.clear();
+		
+		for (RankingRow ranking : rankingList)
+		{
+			this.rankingAdapter.add(ranking);
+		}
+		
+		if (enableReady)
+		{
+			Button ready = findViewById(R.id.ready);
+			ready.setVisibility(View.VISIBLE);
+		}
+	}
+	
 	public void playerReady()
 	{
-		GameScreen.this.rankingScreen.setVisibility(false);
+		displayRankingScreen(false);
+		
+		this.rankingAdapter.clear();
 		
 		this.game.restartRace();
+	}
+	
+	private void displayRankingScreen(boolean display)
+	{
+		LinearLayout rankingScreen = findViewById(R.id.ranking_screen);
+		
+		if (display)
+		{
+			rankingScreen.setVisibility(View.VISIBLE);
+		}
+		else
+		{
+			rankingScreen.setVisibility(View.INVISIBLE);
+		}
 	}
 	
 	public void onDisconnect()

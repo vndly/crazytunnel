@@ -1,6 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.mauriciotogneri.crazytunnel.client.engine.CustomSurfaceView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/glSurface"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+    android:layout_height="match_parent" >
+
+    <com.mauriciotogneri.crazytunnel.client.engine.CustomSurfaceView
+        android:id="@+id/glSurface"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:id="@+id/ranking_screen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#E0000000"
+        android:clickable="true"
+        android:orientation="vertical"
+        android:padding="10dp"
+        android:visibility="invisible" >
+
+        <ListView
+            android:id="@+id/ranking_list"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/ready"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|bottom"
+            android:text="@string/ranking_ready"
+            android:textColor="#FFFFFF"
+            android:visibility="invisible" />
+        
+    </LinearLayout>
+
+</FrameLayout>
