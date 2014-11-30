@@ -209,7 +209,7 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 			});
 			
 			RankingRow firstPlayer = this.ranking.get(0);
-			float lastTime = firstPlayer.time;
+			double lastTime = firstPlayer.time;
 			firstPlayer.timeDifference = 0;
 			
 			for (int i = 1; i < this.ranking.size(); i++)
