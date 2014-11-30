@@ -70,6 +70,10 @@ public class MainActivity extends Activity implements GameEvent
 		}
 		else
 		{
+			Preferences.setPlayers(players);
+			Preferences.setLaps(laps);
+			Preferences.setPort(port);
+			
 			enableInput(false);
 			
 			startServer(this, port, players, laps);
