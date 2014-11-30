@@ -1,4 +1,4 @@
-package com.mauriciotogneri.crazytunnel.connection.udp;
+package com.mauriciotogneri.crazytunnel.network;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -6,27 +6,27 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.Arrays;
 
-public class Connection extends Thread
+public class DatagramCommunication extends Thread
 {
 	private final DatagramSocket socket;
-	private ConnectionEvent callback;
+	private DatagramCommunicationEvent callback;
 	private volatile boolean running = true;
 	
 	private static final int BUFFER_SIZE = 1024;
 	
-	public Connection(int port, ConnectionEvent callback) throws SocketException
+	public DatagramCommunication(int port, DatagramCommunicationEvent callback) throws SocketException
 	{
 		this.socket = new DatagramSocket(port);
 		this.callback = callback;
 	}
 	
-	public Connection(ConnectionEvent callback) throws SocketException
+	public DatagramCommunication(DatagramCommunicationEvent callback) throws SocketException
 	{
 		this.socket = new DatagramSocket();
 		this.callback = callback;
 	}
 	
-	public void setCallback(ConnectionEvent callback)
+	public void setCallback(DatagramCommunicationEvent callback)
 	{
 		this.callback = callback;
 	}
@@ -41,7 +41,7 @@ public class Connection extends Thread
 	{
 		try
 		{
-			byte[] buffer = new byte[Connection.BUFFER_SIZE];
+			byte[] buffer = new byte[DatagramCommunication.BUFFER_SIZE];
 			DatagramPacket datagram = new DatagramPacket(buffer, buffer.length);
 			
 			while (this.running)
@@ -84,7 +84,7 @@ public class Connection extends Thread
 		}
 	}
 	
-	public interface ConnectionEvent
+	public interface DatagramCommunicationEvent
 	{
 		void onReceive(InetAddress address, int port, byte[] message);
 	}
