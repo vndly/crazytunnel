@@ -2,7 +2,7 @@ package com.mauriciotogneri.crazytunnel.client.activities;
 
 import com.mauriciotogneri.crazytunnel.client.R;
 import com.mauriciotogneri.crazytunnel.client.screens.home.HomeScreen;
-import com.mauriciotogneri.crazytunnel.client.shapes.Preferences;
+import com.mauriciotogneri.crazytunnel.client.util.Preferences;
 
 public class MainActivity extends BaseActivity
 {

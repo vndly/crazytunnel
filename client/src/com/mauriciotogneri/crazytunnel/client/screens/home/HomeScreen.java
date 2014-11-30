@@ -7,7 +7,7 @@ import android.widget.EditText;
 import com.mauriciotogneri.crazytunnel.client.R;
 import com.mauriciotogneri.crazytunnel.client.activities.BaseFragment;
 import com.mauriciotogneri.crazytunnel.client.screens.lobby.LobbyScreen;
-import com.mauriciotogneri.crazytunnel.client.shapes.Preferences;
+import com.mauriciotogneri.crazytunnel.client.util.Preferences;
 
 public class HomeScreen extends BaseFragment
 {

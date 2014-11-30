@@ -1,4 +1,4 @@
-package com.mauriciotogneri.crazytunnel.client.shapes;
+package com.mauriciotogneri.crazytunnel.client.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
