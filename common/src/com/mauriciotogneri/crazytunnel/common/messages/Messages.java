@@ -276,8 +276,9 @@ public class Messages
 				String playerName = reader.getString();
 				int playerColor = reader.getInt();
 				float time = reader.getFloat();
+				float timeDifference = reader.getFloat();
 				
-				this.ranking[i] = new RankingRow(playerName, playerColor, time);
+				this.ranking[i] = new RankingRow(playerName, playerColor, time, timeDifference);
 			}
 		}
 		
@@ -292,6 +293,7 @@ public class Messages
 				writer.putString(row.playerName);
 				writer.putInt(row.playerColor);
 				writer.putFloat(row.time);
+				writer.putFloat(row.timeDifference);
 			}
 			
 			return writer.getMessage();
