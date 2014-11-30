@@ -2,8 +2,7 @@ package com.mauriciotogneri.crazytunnel.connection;
 
 import java.net.InetAddress;
 import java.net.Socket;
-import com.mauriciotogneri.crazytunnel.connection.tcp.ServerConnection;
-import com.mauriciotogneri.crazytunnel.connection.tcp.ServerConnection.ServerConnectionEvent;
+import com.mauriciotogneri.crazytunnel.connection.ServerConnection.ServerConnectionEvent;
 import com.mauriciotogneri.crazytunnel.messages.MessageReader;
 import com.mauriciotogneri.crazytunnel.messages.Messages;
 import com.mauriciotogneri.crazytunnel.messages.Messages.PlayerBoxPosition;
@@ -47,25 +46,22 @@ public class Client implements ServerConnectionEvent
 	@Override
 	public void onReceive(byte[] message)
 	{
-		if (message.length > 0)
+		MessageReader reader = new MessageReader(message);
+		byte code = reader.getByte();
+		
+		switch (code)
 		{
-			MessageReader reader = new MessageReader(message);
-			byte code = reader.getByte();
+			case Messages.PlayerConnect.CODE:
+				processPlayerConnect(new PlayerConnect(reader));
+				break;
 			
-			switch (code)
-			{
-				case Messages.PlayerConnect.CODE:
-					processPlayerConnect(new PlayerConnect(reader));
-					break;
-				
-				case Messages.Ready.CODE:
-					this.game.processReady();
-					break;
-				
-				case Messages.PlayerBoxPosition.CODE:
-					this.game.processPlayerBoxPosition(this, new PlayerBoxPosition(reader));
-					break;
-			}
+			case Messages.Ready.CODE:
+				this.game.processReady();
+				break;
+			
+			case Messages.PlayerBoxPosition.CODE:
+				this.game.processPlayerBoxPosition(this, new PlayerBoxPosition(reader));
+				break;
 		}
 	}
 	

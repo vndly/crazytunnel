@@ -10,20 +10,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import com.mauriciotogneri.crazytunnel.connection.tcp.Server;
-import com.mauriciotogneri.crazytunnel.connection.tcp.Server.ServerEvent;
-import com.mauriciotogneri.crazytunnel.connection.udp.Connection;
-import com.mauriciotogneri.crazytunnel.connection.udp.Connection.ConnectionEvent;
+import com.mauriciotogneri.crazytunnel.connection.Server.ServerEvent;
 import com.mauriciotogneri.crazytunnel.messages.MessageReader;
 import com.mauriciotogneri.crazytunnel.messages.Messages;
 import com.mauriciotogneri.crazytunnel.messages.Messages.PlayerBoxPosition;
 import com.mauriciotogneri.crazytunnel.messages.Messages.PlayerConnect;
+import com.mauriciotogneri.crazytunnel.network.DatagramCommunication;
+import com.mauriciotogneri.crazytunnel.network.DatagramCommunication.DatagramCommunicationEvent;
 import com.mauriciotogneri.crazytunnel.objects.Player;
 
-public class Game implements ServerEvent, ConnectionEvent
+public class Game implements ServerEvent, DatagramCommunicationEvent
 {
 	private final Server server;
-	private final Connection connection;
+	private final DatagramCommunication datagramCommunication;
 	
 	private int playersReady = 0;
 	
@@ -41,7 +40,7 @@ public class Game implements ServerEvent, ConnectionEvent
 	public Game(int port, int numberOfPlayers, int numberOfLaps) throws SocketException
 	{
 		this.server = new Server(this, port);
-		this.connection = new Connection(this);
+		this.datagramCommunication = new DatagramCommunication(this);
 		
 		this.numberOfPlayers = numberOfPlayers;
 		this.numberOfLaps = numberOfLaps;
@@ -66,12 +65,12 @@ public class Game implements ServerEvent, ConnectionEvent
 	public void start()
 	{
 		this.server.start();
-		this.connection.start();
+		this.datagramCommunication.start();
 	}
 	
 	public int getUdpPort()
 	{
-		return this.connection.getLocalPort();
+		return this.datagramCommunication.getLocalPort();
 	}
 	
 	@Override
@@ -214,17 +213,14 @@ public class Game implements ServerEvent, ConnectionEvent
 	@Override
 	public void onReceive(InetAddress address, int port, byte[] message)
 	{
-		if (message.length > 0)
+		MessageReader reader = new MessageReader(message);
+		byte code = reader.getByte();
+		
+		switch (code)
 		{
-			MessageReader reader = new MessageReader(message);
-			byte code = reader.getByte();
-			
-			switch (code)
-			{
-				case Messages.PlayerBoxPosition.CODE:
-					processPlayerBoxPosition(address, message);
-					break;
-			}
+			case Messages.PlayerBoxPosition.CODE:
+				processPlayerBoxPosition(address, message);
+				break;
 		}
 	}
 	
@@ -236,7 +232,7 @@ public class Game implements ServerEvent, ConnectionEvent
 		{
 			if (!client.getRemoteAddress().equals(address))
 			{
-				this.connection.send(client.getRemoteAddress(), client.getUdpPort(), message);
+				this.datagramCommunication.send(client.getRemoteAddress(), client.getUdpPort(), message);
 			}
 		}
 	}
