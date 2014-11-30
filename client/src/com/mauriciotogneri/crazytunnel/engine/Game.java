@@ -6,14 +6,14 @@ import android.content.Context;
 import android.os.Vibrator;
 import android.util.SparseArray;
 import com.mauriciotogneri.crazytunnel.R;
-import com.mauriciotogneri.crazytunnel.connection.tcp.ClientConnection;
-import com.mauriciotogneri.crazytunnel.connection.tcp.ClientConnection.ClientConnectionEvent;
-import com.mauriciotogneri.crazytunnel.connection.udp.Connection;
-import com.mauriciotogneri.crazytunnel.connection.udp.Connection.ConnectionEvent;
+import com.mauriciotogneri.crazytunnel.connection.ClientConnection;
+import com.mauriciotogneri.crazytunnel.connection.ClientConnection.ClientConnectionEvent;
 import com.mauriciotogneri.crazytunnel.input.InputEvent;
 import com.mauriciotogneri.crazytunnel.messages.MessageReader;
 import com.mauriciotogneri.crazytunnel.messages.Messages;
 import com.mauriciotogneri.crazytunnel.messages.Messages.PlayerBoxPosition;
+import com.mauriciotogneri.crazytunnel.network.DatagramCommunication;
+import com.mauriciotogneri.crazytunnel.network.DatagramCommunication.DatagramCommunicationEvent;
 import com.mauriciotogneri.crazytunnel.objects.Player;
 import com.mauriciotogneri.crazytunnel.objects.box.EnemyBox;
 import com.mauriciotogneri.crazytunnel.objects.box.PlayerBox;
@@ -22,13 +22,13 @@ import com.mauriciotogneri.crazytunnel.objects.level.LevelDefinition;
 import com.mauriciotogneri.crazytunnel.screens.game.GameScreen;
 import com.mauriciotogneri.crazytunnel.util.ConnectionUtils;
 
-public class Game implements ClientConnectionEvent, ConnectionEvent
+public class Game implements ClientConnectionEvent, DatagramCommunicationEvent
 {
 	private final GameScreen gameScreen;
 	private Renderer renderer;
 	
 	private final int udpPort;
-	private final Connection connection;
+	private final DatagramCommunication connection;
 	private final ClientConnection clientConnection;
 	
 	private final Player player;
@@ -36,7 +36,6 @@ public class Game implements ClientConnectionEvent, ConnectionEvent
 	
 	private final Camera camera;
 	
-	private final boolean lastInput = false;
 	private final PlayerBox playerBox;
 	private final SparseArray<EnemyBox> enemyBoxes = new SparseArray<EnemyBox>();
 	
@@ -51,7 +50,7 @@ public class Game implements ClientConnectionEvent, ConnectionEvent
 		FINISHED; // the race is finished
 	}
 	
-	public Game(GameScreen gameScreen, ClientConnection clientConnection, Connection connection, int udpPort, Player player, List<Player> enemies, int laps)
+	public Game(GameScreen gameScreen, ClientConnection clientConnection, DatagramCommunication connection, int udpPort, Player player, List<Player> enemies, int laps)
 	{
 		this.gameScreen = gameScreen;
 		
@@ -261,42 +260,36 @@ public class Game implements ClientConnectionEvent, ConnectionEvent
 	@Override
 	public void onReceive(byte[] message)
 	{
-		if (message.length > 0)
+		MessageReader reader = new MessageReader(message);
+		byte code = reader.getByte();
+		
+		switch (code)
 		{
-			MessageReader reader = new MessageReader(message);
-			byte code = reader.getByte();
+			case Messages.StartRace.CODE:
+				startRace();
+				break;
 			
-			switch (code)
-			{
-				case Messages.StartRace.CODE:
-					startRace();
-					break;
-				
-				case Messages.RestartRace.CODE:
-					restartRace();
-					break;
-				
-				case Messages.PlayerBoxPosition.CODE:
-					updateBoxPosition(new PlayerBoxPosition(reader));
-					break;
-			}
+			case Messages.RestartRace.CODE:
+				restartRace();
+				break;
+			
+			case Messages.PlayerBoxPosition.CODE:
+				updateBoxPosition(new PlayerBoxPosition(reader));
+				break;
 		}
 	}
 	
 	@Override
 	public void onReceive(InetAddress address, int port, byte[] message)
 	{
-		if (message.length > 0)
+		MessageReader reader = new MessageReader(message);
+		byte code = reader.getByte();
+		
+		switch (code)
 		{
-			MessageReader reader = new MessageReader(message);
-			byte code = reader.getByte();
-			
-			switch (code)
-			{
-				case Messages.PlayerBoxPosition.CODE:
-					updateBoxPosition(new PlayerBoxPosition(reader));
-					break;
-			}
+			case Messages.PlayerBoxPosition.CODE:
+				updateBoxPosition(new PlayerBoxPosition(reader));
+				break;
 		}
 	}
 }

@@ -3,11 +3,11 @@ package com.mauriciotogneri.crazytunnel.screens.game;
 import java.util.List;
 import com.mauriciotogneri.crazytunnel.R;
 import com.mauriciotogneri.crazytunnel.activities.BaseFragment;
-import com.mauriciotogneri.crazytunnel.connection.tcp.ClientConnection;
-import com.mauriciotogneri.crazytunnel.connection.udp.Connection;
+import com.mauriciotogneri.crazytunnel.connection.ClientConnection;
 import com.mauriciotogneri.crazytunnel.engine.CustomSurfaceView;
 import com.mauriciotogneri.crazytunnel.engine.Game;
 import com.mauriciotogneri.crazytunnel.engine.Renderer;
+import com.mauriciotogneri.crazytunnel.network.DatagramCommunication;
 import com.mauriciotogneri.crazytunnel.objects.Player;
 
 public class GameScreen extends BaseFragment
@@ -29,12 +29,12 @@ public class GameScreen extends BaseFragment
 		List<Player> enemies = getParameter(GameScreen.PARAMETER_ENEMIES);
 		
 		ClientConnection clientConnection = getParameter(GameScreen.PARAMETER_CONNECTION_TCP);
-		Connection connection = getParameter(GameScreen.PARAMETER_CONNECTION_UDP);
+		DatagramCommunication datagramCommunication = getParameter(GameScreen.PARAMETER_CONNECTION_UDP);
 		int udpPort = getParameter(GameScreen.PARAMETER_SERVER_UDP_PORT);
 		
 		int laps = getParameter(GameScreen.PARAMETER_LAPS);
 		
-		this.game = new Game(this, clientConnection, connection, udpPort, player, enemies, laps);
+		this.game = new Game(this, clientConnection, datagramCommunication, udpPort, player, enemies, laps);
 		
 		this.screen = findViewById(R.id.glSurface);
 		this.screen.setRenderer(new Renderer(this.game, getContext(), this.screen));

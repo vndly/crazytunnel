@@ -8,25 +8,25 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import com.mauriciotogneri.crazytunnel.R;
 import com.mauriciotogneri.crazytunnel.activities.BaseFragment;
-import com.mauriciotogneri.crazytunnel.connection.tcp.ClientConnection;
-import com.mauriciotogneri.crazytunnel.connection.tcp.ClientConnection.ClientConnectionEvent;
-import com.mauriciotogneri.crazytunnel.connection.udp.Connection;
-import com.mauriciotogneri.crazytunnel.connection.udp.Connection.ConnectionEvent;
+import com.mauriciotogneri.crazytunnel.connection.ClientConnection;
+import com.mauriciotogneri.crazytunnel.connection.ClientConnection.ClientConnectionEvent;
 import com.mauriciotogneri.crazytunnel.messages.MessageReader;
 import com.mauriciotogneri.crazytunnel.messages.Messages;
 import com.mauriciotogneri.crazytunnel.messages.Messages.PlayerInfo;
 import com.mauriciotogneri.crazytunnel.messages.Messages.PlayersList;
 import com.mauriciotogneri.crazytunnel.messages.Messages.StartGame;
+import com.mauriciotogneri.crazytunnel.network.DatagramCommunication;
+import com.mauriciotogneri.crazytunnel.network.DatagramCommunication.DatagramCommunicationEvent;
 import com.mauriciotogneri.crazytunnel.objects.Player;
 import com.mauriciotogneri.crazytunnel.screens.game.GameScreen;
 import com.mauriciotogneri.crazytunnel.util.ConnectionUtils;
 
-public class LobbyScreen extends BaseFragment implements ClientConnectionEvent, ConnectionEvent
+public class LobbyScreen extends BaseFragment implements ClientConnectionEvent, DatagramCommunicationEvent
 {
 	private Player player;
 	private PlayerAdapter playerAdapter;
 	
-	private Connection connection;
+	private DatagramCommunication datagramCommunication;
 	private ClientConnection clientconnection;
 	
 	private int udpPort = 0;
@@ -53,8 +53,8 @@ public class LobbyScreen extends BaseFragment implements ClientConnectionEvent, 
 		
 		try
 		{
-			this.connection = new Connection(this);
-			this.connection.start();
+			this.datagramCommunication = new DatagramCommunication(this);
+			this.datagramCommunication.start();
 		}
 		catch (Exception e)
 		{
@@ -102,7 +102,7 @@ public class LobbyScreen extends BaseFragment implements ClientConnectionEvent, 
 		gameScreen.setParameter(GameScreen.PARAMETER_PLAYER, this.player);
 		gameScreen.setParameter(GameScreen.PARAMETER_ENEMIES, enemies);
 		gameScreen.setParameter(GameScreen.PARAMETER_CONNECTION_TCP, this.clientconnection);
-		gameScreen.setParameter(GameScreen.PARAMETER_CONNECTION_UDP, this.connection);
+		gameScreen.setParameter(GameScreen.PARAMETER_CONNECTION_UDP, this.datagramCommunication);
 		gameScreen.setParameter(GameScreen.PARAMETER_SERVER_UDP_PORT, this.udpPort);
 		gameScreen.setParameter(GameScreen.PARAMETER_LAPS, startGame.laps);
 		openFragment(gameScreen);
@@ -138,7 +138,7 @@ public class LobbyScreen extends BaseFragment implements ClientConnectionEvent, 
 	@Override
 	public void onConnect()
 	{
-		ConnectionUtils.send(this.clientconnection, Messages.PlayerConnect.create(this.playerName, this.connection.getLocalPort()));
+		ConnectionUtils.send(this.clientconnection, Messages.PlayerConnect.create(this.playerName, this.datagramCommunication.getLocalPort()));
 	}
 	
 	@Override
@@ -158,25 +158,22 @@ public class LobbyScreen extends BaseFragment implements ClientConnectionEvent, 
 	@Override
 	public void onReceive(byte[] message)
 	{
-		if (message.length > 0)
+		MessageReader reader = new MessageReader(message);
+		byte code = reader.getByte();
+		
+		switch (code)
 		{
-			MessageReader reader = new MessageReader(message);
-			byte code = reader.getByte();
+			case Messages.PlayerInfo.CODE:
+				processPlayerInfo(new PlayerInfo(reader));
+				break;
 			
-			switch (code)
-			{
-				case Messages.PlayerInfo.CODE:
-					processPlayerInfo(new PlayerInfo(reader));
-					break;
-				
-				case Messages.PlayersList.CODE:
-					processPlayersList(new PlayersList(reader));
-					break;
-				
-				case Messages.StartGame.CODE:
-					processStartGame(new StartGame(reader));
-					break;
-			}
+			case Messages.PlayersList.CODE:
+				processPlayersList(new PlayersList(reader));
+				break;
+			
+			case Messages.StartGame.CODE:
+				processStartGame(new StartGame(reader));
+				break;
 		}
 	}
 	
