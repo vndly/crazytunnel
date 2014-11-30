@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import com.mauriciotogneri.crazytunnel.common.objects.Player;
+import com.mauriciotogneri.crazytunnel.common.objects.RankingRow;
 
 public class Messages
 {
@@ -228,6 +229,70 @@ public class Messages
 			writer.putBoolean(jumping);
 			writer.putFloat(x);
 			writer.putFloat(y);
+			
+			return writer.getMessage();
+		}
+	}
+	
+	public static class PlayerFinished
+	{
+		public final String playerName;
+		public final int playerColor;
+		public final float time;
+		
+		public static final byte CODE = 9;
+		
+		public PlayerFinished(MessageReader reader)
+		{
+			this.playerName = reader.getString();
+			this.playerColor = reader.getInt();
+			this.time = reader.getInt();
+		}
+		
+		public static byte[] create(String playerName, int playerColor, float time)
+		{
+			MessageWriter writer = new MessageWriter();
+			writer.putByte(PlayerFinished.CODE);
+			writer.putString(playerName);
+			writer.putInt(playerColor);
+			writer.putFloat(time);
+			
+			return writer.getMessage();
+		}
+	}
+	
+	public static class RankingList
+	{
+		public final RankingRow[] ranking;
+		
+		public static final byte CODE = 10;
+		
+		public RankingList(MessageReader reader)
+		{
+			this.ranking = new RankingRow[reader.getInt()];
+			
+			for (int i = 0; i < this.ranking.length; i++)
+			{
+				String playerName = reader.getString();
+				int playerColor = reader.getInt();
+				float time = reader.getFloat();
+				
+				this.ranking[i] = new RankingRow(playerName, playerColor, time);
+			}
+		}
+		
+		public static byte[] create(Collection<RankingRow> ranking)
+		{
+			MessageWriter writer = new MessageWriter();
+			writer.putByte(RankingList.CODE);
+			writer.putInt(ranking.size());
+			
+			for (RankingRow row : ranking)
+			{
+				writer.putString(row.playerName);
+				writer.putInt(row.playerColor);
+				writer.putFloat(row.time);
+			}
 			
 			return writer.getMessage();
 		}
