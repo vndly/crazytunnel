@@ -67,6 +67,19 @@ public class MessageReader
 		return 0;
 	}
 	
+	public double getDouble()
+	{
+		try
+		{
+			return this.dataStream.readDouble();
+		}
+		catch (IOException e)
+		{
+		}
+		
+		return 0;
+	}
+	
 	public String getString()
 	{
 		try

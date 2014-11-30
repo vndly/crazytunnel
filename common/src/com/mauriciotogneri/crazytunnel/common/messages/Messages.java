@@ -238,7 +238,7 @@ public class Messages
 	{
 		public final String playerName;
 		public final int playerColor;
-		public final float time;
+		public final double time;
 		
 		public static final byte CODE = 9;
 		
@@ -246,16 +246,16 @@ public class Messages
 		{
 			this.playerName = reader.getString();
 			this.playerColor = reader.getInt();
-			this.time = reader.getFloat();
+			this.time = reader.getDouble();
 		}
 		
-		public static byte[] create(String playerName, int playerColor, float time)
+		public static byte[] create(String playerName, int playerColor, double time)
 		{
 			MessageWriter writer = new MessageWriter();
 			writer.putByte(PlayerFinished.CODE);
 			writer.putString(playerName);
 			writer.putInt(playerColor);
-			writer.putFloat(time);
+			writer.putDouble(time);
 			
 			return writer.getMessage();
 		}
@@ -275,8 +275,8 @@ public class Messages
 			{
 				String playerName = reader.getString();
 				int playerColor = reader.getInt();
-				float time = reader.getFloat();
-				float timeDifference = reader.getFloat();
+				double time = reader.getDouble();
+				double timeDifference = reader.getDouble();
 				
 				this.ranking[i] = new RankingRow(playerName, playerColor, time, timeDifference);
 			}
@@ -292,8 +292,8 @@ public class Messages
 			{
 				writer.putString(row.playerName);
 				writer.putInt(row.playerColor);
-				writer.putFloat(row.time);
-				writer.putFloat(row.timeDifference);
+				writer.putDouble(row.time);
+				writer.putDouble(row.timeDifference);
 			}
 			
 			return writer.getMessage();

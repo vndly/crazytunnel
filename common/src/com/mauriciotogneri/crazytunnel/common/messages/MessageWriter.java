@@ -59,6 +59,17 @@ public class MessageWriter
 		}
 	}
 	
+	public void putDouble(double value)
+	{
+		try
+		{
+			this.dataStream.writeDouble(value);
+		}
+		catch (IOException e)
+		{
+		}
+	}
+	
 	public void putString(String value)
 	{
 		try
