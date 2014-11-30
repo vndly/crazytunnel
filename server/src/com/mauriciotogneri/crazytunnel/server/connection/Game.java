@@ -75,9 +75,15 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 	}
 	
 	@Override
+	public void onConnected(InetAddress address, int port)
+	{
+		this.gameEvent.onConnected(address, port);
+	}
+	
+	@Override
 	public void onFinished()
 	{
-		System.err.println("SERVER FINISHED");
+		this.gameEvent.onFinished();
 	}
 	
 	public void clientDisconnect(Client client)
@@ -233,14 +239,11 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 	{
 		void onConnected(InetAddress address, int port);
 		
+		void onFinished();
+		
 		void onClientConnected(InetAddress address);
 		
 		void onClientDisconnect(InetAddress address);
 	}
 	
-	@Override
-	public void onConnected(InetAddress address, int port)
-	{
-		this.gameEvent.onConnected(address, port);
-	}
 }

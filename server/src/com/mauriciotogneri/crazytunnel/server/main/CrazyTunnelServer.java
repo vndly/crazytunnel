@@ -81,4 +81,10 @@ public class CrazyTunnelServer implements GameEvent
 	{
 		System.out.println("SERVER STARTED: " + address + ":" + port);
 	}
+	
+	@Override
+	public void onFinished()
+	{
+		System.err.println("SERVER CLOSED");
+	}
 }
