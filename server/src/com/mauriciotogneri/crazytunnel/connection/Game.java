@@ -55,8 +55,8 @@ public class Game implements ServerEvent, ConnectionEvent
 		
 		try
 		{
-			System.out.println("TCP: " + InetAddress.getLocalHost() + ":" + port);
-			System.out.println("UDP: " + InetAddress.getLocalHost() + ":" + this.connection.getLocalPort());
+			log("TCP: " + InetAddress.getLocalHost() + ":" + port);
+			log("UDP: " + InetAddress.getLocalHost() + ":" + this.connection.getLocalPort());
 		}
 		catch (UnknownHostException e)
 		{
@@ -78,7 +78,7 @@ public class Game implements ServerEvent, ConnectionEvent
 	@Override
 	public void onConnected(Socket socket)
 	{
-		System.out.println("NEW CONNECTION: " + socket.getInetAddress().getHostAddress());
+		log("NEW CONNECTION: " + socket.getInetAddress().getHostAddress());
 		
 		Client client = new Client(this, socket);
 		client.start();
@@ -92,7 +92,7 @@ public class Game implements ServerEvent, ConnectionEvent
 	
 	public void clientDisconnect(Client client)
 	{
-		System.out.println("CLIENT DISCONNECTED: " + client.getRemoteAddress().getHostAddress());
+		log("CLIENT DISCONNECTED: " + client.getRemoteAddress().getHostAddress());
 		
 		this.registeredPlayers.remove(client);
 	}
@@ -240,5 +240,10 @@ public class Game implements ServerEvent, ConnectionEvent
 				this.connection.send(client.getRemoteAddress(), client.getUdpPort(), message);
 			}
 		}
+	}
+	
+	private void log(String message)
+	{
+		// System.out.println(message);
 	}
 }
