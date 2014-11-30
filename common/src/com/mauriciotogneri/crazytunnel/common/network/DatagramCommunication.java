@@ -41,6 +41,8 @@ public class DatagramCommunication extends Thread
 	{
 		try
 		{
+			Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+			
 			byte[] buffer = new byte[DatagramCommunication.BUFFER_SIZE];
 			DatagramPacket datagram = new DatagramPacket(buffer, buffer.length);
 			
