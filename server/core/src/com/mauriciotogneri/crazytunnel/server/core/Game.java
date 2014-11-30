@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -35,6 +36,7 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 	private final Object colorLock = new Object();
 	private final List<Integer> colorIndex = new ArrayList<Integer>();
 	
+	private final Object registeredPlayersLock = new Object();
 	private final Map<Client, Player> registeredPlayers = new HashMap<Client, Player>();
 	
 	private final List<RankingRow> ranking = new ArrayList<RankingRow>();
@@ -95,7 +97,10 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 	{
 		this.gameEvent.onClientDisconnect(client.getRemoteAddress());
 		
-		this.registeredPlayers.remove(client);
+		synchronized (this.registeredPlayersLock)
+		{
+			this.registeredPlayers.remove(client);
+		}
 	}
 	
 	public int getPlayerColor()
@@ -126,14 +131,17 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 	{
 		Player result = null;
 		
-		if (this.registeredPlayers.size() < this.numberOfPlayers)
+		synchronized (this.registeredPlayersLock)
 		{
-			byte id = getPlayerId();
-			int color = getPlayerColor();
-			
-			result = new Player(id, playerConnect.name, color);
-			
-			this.registeredPlayers.put(client, result);
+			if (this.registeredPlayers.size() < this.numberOfPlayers)
+			{
+				byte id = getPlayerId();
+				int color = getPlayerColor();
+				
+				result = new Player(id, playerConnect.name, color);
+				
+				this.registeredPlayers.put(client, result);
+			}
 		}
 		
 		return result;
@@ -141,18 +149,21 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 	
 	public void checkStartRace()
 	{
-		if (this.registeredPlayers.size() == this.numberOfPlayers)
+		synchronized (this.registeredPlayersLock)
 		{
-			try
+			if (this.registeredPlayers.size() == this.numberOfPlayers)
 			{
-				Thread.sleep(1000);
+				try
+				{
+					Thread.sleep(1000);
+				}
+				catch (InterruptedException e)
+				{
+					e.printStackTrace();
+				}
+				
+				sendStartGame();
 			}
-			catch (InterruptedException e)
-			{
-				e.printStackTrace();
-			}
-			
-			sendStartGame();
 		}
 	}
 	
@@ -214,12 +225,36 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 	
 	public void sendPlayerList()
 	{
-		sendAllPlayers(Messages.PlayersList.create(this.registeredPlayers.values()));
+		synchronized (this.registeredPlayersLock)
+		{
+			Collection<Player> players = this.registeredPlayers.values();
+			
+			List<Player> list = new ArrayList<Player>();
+			
+			for (Player player : players)
+			{
+				list.add(player);
+			}
+			
+			Collections.sort(list, new Comparator<Player>()
+			{
+				@Override
+				public int compare(Player o1, Player o2)
+				{
+					return o1.id - o2.id;
+				}
+			});
+			
+			sendAllPlayers(Messages.PlayersList.create(this.registeredPlayers.values()));
+		}
 	}
 	
 	private void sendStartGame()
 	{
-		sendAllPlayers(Messages.StartGame.create(this.numberOfLaps, this.registeredPlayers.values()));
+		synchronized (this.registeredPlayersLock)
+		{
+			sendAllPlayers(Messages.StartGame.create(this.numberOfLaps, this.registeredPlayers.values()));
+		}
 	}
 	
 	private void sendStartRace()
@@ -234,13 +269,16 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 	
 	private void sendAllPlayers(Client excludeClient, byte[] message)
 	{
-		Set<Client> clientList = this.registeredPlayers.keySet();
-		
-		for (Client client : clientList)
+		synchronized (this.registeredPlayersLock)
 		{
-			if (client != excludeClient)
+			Set<Client> clientList = this.registeredPlayers.keySet();
+			
+			for (Client client : clientList)
 			{
-				client.send(message);
+				if (client != excludeClient)
+				{
+					client.send(message);
+				}
 			}
 		}
 	}
@@ -261,13 +299,16 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 	
 	private void processPlayerBoxPosition(InetAddress address, byte[] message)
 	{
-		Set<Client> clientList = this.registeredPlayers.keySet();
-		
-		for (Client client : clientList)
+		synchronized (this.registeredPlayersLock)
 		{
-			if (!client.getRemoteAddress().equals(address))
+			Set<Client> clientList = this.registeredPlayers.keySet();
+			
+			for (Client client : clientList)
 			{
-				this.datagramCommunication.send(client.getRemoteAddress(), client.getUdpPort(), message);
+				if (!client.getRemoteAddress().equals(address))
+				{
+					this.datagramCommunication.send(client.getRemoteAddress(), client.getUdpPort(), message);
+				}
 			}
 		}
 	}
