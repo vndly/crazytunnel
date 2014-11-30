@@ -46,12 +46,12 @@ public class Game implements ServerEvent, ConnectionEvent
 		this.numberOfPlayers = numberOfPlayers;
 		this.numberOfLaps = numberOfLaps;
 		
-		this.colorIndex.add(new Color(255, 60, 170, 230).getRGB());
-		this.colorIndex.add(new Color(255, 255, 60, 60).getRGB());
-		this.colorIndex.add(new Color(255, 100, 200, 100).getRGB());
-		this.colorIndex.add(new Color(255, 255, 200, 40).getRGB());
-		this.colorIndex.add(new Color(255, 230, 110, 240).getRGB());
-		this.colorIndex.add(new Color(255, 130, 230, 230).getRGB());
+		this.colorIndex.add(new Color(60, 170, 230, 255).getRGB());
+		this.colorIndex.add(new Color(255, 60, 60, 255).getRGB());
+		this.colorIndex.add(new Color(100, 200, 100, 255).getRGB());
+		this.colorIndex.add(new Color(255, 200, 40, 255).getRGB());
+		this.colorIndex.add(new Color(230, 110, 240, 255).getRGB());
+		this.colorIndex.add(new Color(130, 230, 230, 255).getRGB());
 		
 		try
 		{
