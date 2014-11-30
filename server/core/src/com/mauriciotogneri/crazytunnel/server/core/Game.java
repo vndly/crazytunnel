@@ -151,11 +151,6 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 			}
 			
 			sendStartGame();
-			
-			synchronized (this.ranking)
-			{
-				this.ranking.clear();
-			}
 		}
 	}
 	
@@ -175,6 +170,11 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 			}
 			
 			sendStartRace();
+			
+			synchronized (this.ranking)
+			{
+				this.ranking.clear();
+			}
 			
 			this.playersReady = 0;
 		}
