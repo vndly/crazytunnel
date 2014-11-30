@@ -12,7 +12,7 @@ public class EnemyBox extends Box
 		super(camera, level, x, y, color);
 	}
 	
-	public void update(float delta)
+	public void update(double delta)
 	{
 		if (!finished())
 		{

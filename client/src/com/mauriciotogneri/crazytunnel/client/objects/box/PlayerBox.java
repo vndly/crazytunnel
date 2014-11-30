@@ -18,7 +18,7 @@ public class PlayerBox extends Box
 		this.vibrator = vibrator;
 	}
 	
-	public void update(float delta, InputEvent input)
+	public void update(double delta, InputEvent input)
 	{
 		if (!finished())
 		{

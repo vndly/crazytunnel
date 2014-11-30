@@ -58,7 +58,7 @@ public class LobbyScreen extends BaseFragment implements ClientConnectionEvent, 
 		}
 		catch (Exception e)
 		{
-			finish();
+			close();
 			showToast("ERROR CREATING CONNECTION");
 		}
 	}
@@ -144,14 +144,14 @@ public class LobbyScreen extends BaseFragment implements ClientConnectionEvent, 
 	@Override
 	public void onErrorConnecting()
 	{
-		finish();
+		close();
 		showToast("ERROR CONNECTING");
 	}
 	
 	@Override
 	public void onDisconnect()
 	{
-		finish();
+		close();
 		showToast("DISCONNECCTED");
 	}
 	

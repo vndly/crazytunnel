@@ -55,7 +55,7 @@ public class Box
 		this.acceleration += Box.JUMP_FORCE;
 	}
 	
-	protected void updatePosition(float delta)
+	protected void updatePosition(double delta)
 	{
 		this.acceleration -= Box.GRAVITY;
 		

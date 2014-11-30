@@ -105,7 +105,7 @@ public class Game implements ClientConnectionEvent, DatagramCommunicationEvent
 	
 	// ======================== UPDATE ====================== \\
 	
-	public void update(float delta, InputEvent input, Renderer renderer)
+	public void update(double delta, InputEvent input, Renderer renderer)
 	{
 		switch (this.gameStatus)
 		{
@@ -123,7 +123,7 @@ public class Game implements ClientConnectionEvent, DatagramCommunicationEvent
 		render(renderer, this.camera, this.level, this.playerBox, this.enemyBoxes);
 	}
 	
-	private void processRunning(float delta, InputEvent input)
+	private void processRunning(double delta, InputEvent input)
 	{
 		this.totalTime += delta;
 		this.playerBox.update(delta, input);

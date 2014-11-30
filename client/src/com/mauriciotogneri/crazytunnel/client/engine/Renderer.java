@@ -91,7 +91,7 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer
 		}
 	}
 	
-	private void update(float delta)
+	private void update(double delta)
 	{
 		synchronized (this.inputLock)
 		{
@@ -144,7 +144,7 @@ public class Renderer implements android.opengl.GLSurfaceView.Renderer
 		if (status == RendererStatus.RUNNING)
 		{
 			long currentTime = System.nanoTime();
-			float delta = (currentTime - this.startTime) / 1E9f;
+			double delta = (currentTime - this.startTime) / 1E9d;
 			this.startTime = currentTime;
 			
 			// FPS.log(currentTime);

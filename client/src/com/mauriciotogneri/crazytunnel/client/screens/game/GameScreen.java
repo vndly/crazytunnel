@@ -130,7 +130,7 @@ public class GameScreen extends BaseFragment
 	
 	public void onDisconnect()
 	{
-		finish();
+		close();
 		showToast("DISCONNECTED");
 	}
 	
