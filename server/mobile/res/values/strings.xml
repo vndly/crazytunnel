@@ -5,6 +5,7 @@
     
     <string name="main_players">Players:</string>
     <string name="main_laps">Laps:</string>
+    <string name="main_port">Port:</string>
     <string name="main_start">Start</string>
 
 </resources>

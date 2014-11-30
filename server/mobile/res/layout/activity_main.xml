@@ -30,6 +30,7 @@
                 android:layout_weight="1"
                 android:inputType="number"
                 android:lines="1"
+                android:maxLength="1"
                 android:maxLines="1"
                 android:singleLine="true" />
 
@@ -49,6 +50,27 @@
                 android:layout_weight="1"
                 android:inputType="number"
                 android:lines="1"
+                android:maxLength="2"
+                android:maxLines="1"
+                android:singleLine="true" />
+            
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingEnd="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingStart="10dp"
+                android:text="@string/main_port" />
+
+            <EditText
+                android:id="@+id/port"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:inputType="number"
+                android:lines="1"
+                android:maxLength="5"
                 android:maxLines="1"
                 android:singleLine="true" />
             
