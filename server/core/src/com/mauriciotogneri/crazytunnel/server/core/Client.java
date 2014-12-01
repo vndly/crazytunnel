@@ -80,7 +80,7 @@ public class Client implements ServerConnectionEvent
 			
 			send(PlayerInfo.create(player.id, playerConnect.name, player.color, this.game.getUdpPort()));
 			this.game.sendPlayerList();
-			this.game.checkStartRace();
+			this.game.checkStartGame();
 		}
 		else
 		{

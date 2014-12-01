@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import com.mauriciotogneri.crazytunnel.common.messages.MessageReader;
 import com.mauriciotogneri.crazytunnel.common.messages.Messages;
 import com.mauriciotogneri.crazytunnel.common.messages.Messages.PlayerConnect;
@@ -28,17 +29,11 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 	private final Server server;
 	private final DatagramCommunication datagramCommunication;
 	
-	private int playersReady = 0;
+	private final AtomicInteger playersReady = new AtomicInteger(0);
+	private final AtomicInteger nextPlayerId = new AtomicInteger(0);
 	
-	private final Object playerIdLock = new Object();
-	private byte nextPlayerId = 1;
-	
-	private final Object colorLock = new Object();
-	private final List<Integer> colorIndex = new ArrayList<Integer>();
-	
-	private final Object registeredPlayersLock = new Object();
-	private final Map<Client, Player> registeredPlayers = new HashMap<Client, Player>();
-	
+	private final List<Integer> colors = new ArrayList<Integer>();
+	private final Map<Client, Player> players = new HashMap<Client, Player>();
 	private final List<RankingRow> ranking = new ArrayList<RankingRow>();
 	
 	private final int numberOfPlayers;
@@ -53,12 +48,12 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 		this.numberOfPlayers = numberOfPlayers;
 		this.numberOfLaps = numberOfLaps;
 		
-		this.colorIndex.add(Color.getColor(60, 170, 230, 255));
-		this.colorIndex.add(Color.getColor(255, 60, 60, 255));
-		this.colorIndex.add(Color.getColor(100, 200, 100, 255));
-		this.colorIndex.add(Color.getColor(255, 200, 40, 255));
-		this.colorIndex.add(Color.getColor(230, 110, 240, 255));
-		this.colorIndex.add(Color.getColor(130, 230, 230, 255));
+		this.colors.add(Color.getColor(60, 170, 230, 255));
+		this.colors.add(Color.getColor(255, 60, 60, 255));
+		this.colors.add(Color.getColor(100, 200, 100, 255));
+		this.colors.add(Color.getColor(255, 200, 40, 255));
+		this.colors.add(Color.getColor(230, 110, 240, 255));
+		this.colors.add(Color.getColor(130, 230, 230, 255));
 	}
 	
 	public void start()
@@ -97,9 +92,9 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 	{
 		this.gameEvent.onClientDisconnect(client.getRemoteAddress());
 		
-		synchronized (this.registeredPlayersLock)
+		synchronized (this.players)
 		{
-			this.registeredPlayers.remove(client);
+			this.players.remove(client);
 		}
 	}
 	
@@ -107,21 +102,9 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 	{
 		int result = 0;
 		
-		synchronized (this.colorLock)
+		synchronized (this.colors)
 		{
-			result = this.colorIndex.remove(0);
-		}
-		
-		return result;
-	}
-	
-	public byte getPlayerId()
-	{
-		byte result = 0;
-		
-		synchronized (this.playerIdLock)
-		{
-			result = this.nextPlayerId++;
+			result = this.colors.remove(0);
 		}
 		
 		return result;
@@ -131,27 +114,27 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 	{
 		Player result = null;
 		
-		synchronized (this.registeredPlayersLock)
+		synchronized (this.players)
 		{
-			if (this.registeredPlayers.size() < this.numberOfPlayers)
+			if (this.players.size() < this.numberOfPlayers)
 			{
-				byte id = getPlayerId();
+				int id = this.nextPlayerId.incrementAndGet();
 				int color = getPlayerColor();
 				
 				result = new Player(id, playerConnect.name, color);
 				
-				this.registeredPlayers.put(client, result);
+				this.players.put(client, result);
 			}
 		}
 		
 		return result;
 	}
 	
-	public void checkStartRace()
+	public void checkStartGame()
 	{
-		synchronized (this.registeredPlayersLock)
+		synchronized (this.players)
 		{
-			if (this.registeredPlayers.size() == this.numberOfPlayers)
+			if (this.players.size() == this.numberOfPlayers)
 			{
 				try
 				{
@@ -169,9 +152,7 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 	
 	public void processReady()
 	{
-		this.playersReady++;
-		
-		if (this.playersReady == this.numberOfPlayers)
+		if (this.playersReady.incrementAndGet() == this.numberOfPlayers)
 		{
 			try
 			{
@@ -189,7 +170,7 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 				this.ranking.clear();
 			}
 			
-			this.playersReady = 0;
+			this.playersReady.set(0);
 		}
 	}
 	
@@ -225,9 +206,9 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 	
 	public void sendPlayerList()
 	{
-		synchronized (this.registeredPlayersLock)
+		synchronized (this.players)
 		{
-			Collection<Player> players = this.registeredPlayers.values();
+			Collection<Player> players = this.players.values();
 			
 			List<Player> list = new ArrayList<Player>();
 			
@@ -245,15 +226,15 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 				}
 			});
 			
-			sendAllPlayers(Messages.PlayersList.create(this.registeredPlayers.values()));
+			sendAllPlayers(Messages.PlayersList.create(this.players.values()));
 		}
 	}
 	
 	private void sendStartGame()
 	{
-		synchronized (this.registeredPlayersLock)
+		synchronized (this.players)
 		{
-			sendAllPlayers(Messages.StartGame.create(this.numberOfLaps, this.registeredPlayers.values()));
+			sendAllPlayers(Messages.StartGame.create(this.numberOfLaps, this.players.values()));
 		}
 	}
 	
@@ -269,9 +250,9 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 	
 	private void sendAllPlayers(Client excludeClient, byte[] message)
 	{
-		synchronized (this.registeredPlayersLock)
+		synchronized (this.players)
 		{
-			Set<Client> clientList = this.registeredPlayers.keySet();
+			Set<Client> clientList = this.players.keySet();
 			
 			for (Client client : clientList)
 			{
@@ -299,9 +280,9 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 	
 	private void processPlayerBoxPosition(InetAddress address, byte[] message)
 	{
-		synchronized (this.registeredPlayersLock)
+		synchronized (this.players)
 		{
-			Set<Client> clientList = this.registeredPlayers.keySet();
+			Set<Client> clientList = this.players.keySet();
 			
 			for (Client client : clientList)
 			{
