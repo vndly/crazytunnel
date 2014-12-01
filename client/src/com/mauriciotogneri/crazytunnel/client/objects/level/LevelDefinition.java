@@ -29,9 +29,7 @@ public class LevelDefinition
 	
 	public static final int WALL_COLOR = Color.argb(255, 90, 110, 120);
 	
-	private static final int WALL_HEIGHT = 5;
-	
-	public static final int BLOCK_SIZE = 5;
+	private static final int WALL_HEIGHT = 4;
 	
 	public LevelDefinition(Context context, int mapId, int laps)
 	{
