@@ -16,9 +16,12 @@ public class Box
 	private final float initialY;
 	
 	private final Sprite sprite;
-	private float acceleration = 0;
 	
-	private final Object lock = new Object();
+	private boolean jump = false;
+	
+	private boolean finished = false;
+	
+	private float acceleration = 0;
 	
 	private static final float SLOW_RATIO = 1f; // 0.2f;
 	
@@ -44,19 +47,23 @@ public class Box
 		this.sprite = new Sprite(square, x, y);
 	}
 	
-	public void restart()
+	public synchronized void restart()
 	{
 		this.sprite.x = this.initialX;
 		this.sprite.y = this.initialY;
+		
+		this.finished = false;
+		
+		this.jump = false;
 	}
 	
-	protected void jump()
+	protected synchronized void updatePosition(double delta)
 	{
-		this.acceleration += Box.JUMP_FORCE;
-	}
-	
-	protected void updatePosition(double delta)
-	{
+		if (this.jump)
+		{
+			this.acceleration += Box.JUMP_FORCE;
+		}
+		
 		this.acceleration -= Box.GRAVITY;
 		
 		if (this.acceleration > Box.MAX_ACCELERATION_UP)
@@ -68,56 +75,49 @@ public class Box
 			this.acceleration = -Box.MAX_ACCELERATION_DOWN;
 		}
 		
-		synchronized (this.lock)
+		this.sprite.x += delta * getSpeed();
+		this.sprite.y += delta * this.acceleration;
+		
+		if (this.sprite.y < 0)
 		{
-			this.sprite.x += delta * getSpeed();
-			this.sprite.y += delta * this.acceleration;
-			
-			if (this.sprite.y < 0)
-			{
-				this.sprite.y = 0;
-			}
-			else if (this.sprite.y > (Renderer.RESOLUTION_Y - Box.SIZE))
-			{
-				this.sprite.y = Renderer.RESOLUTION_Y - Box.SIZE;
-			}
+			this.sprite.y = 0;
+		}
+		else if (this.sprite.y > (Renderer.RESOLUTION_Y - Box.SIZE))
+		{
+			this.sprite.y = Renderer.RESOLUTION_Y - Box.SIZE;
 		}
 	}
 	
-	public boolean finished()
+	public synchronized boolean finished()
 	{
-		return this.level.finished(this.sprite);
+		return this.finished || (this.finished = this.level.finished(this.sprite));
 	}
 	
-	public float getX()
+	public synchronized float getX()
 	{
-		synchronized (this.lock)
+		return this.sprite.x;
+	}
+	
+	public synchronized float getY()
+	{
+		return this.sprite.y;
+	}
+	
+	protected synchronized void updatePosition(float x, float y)
+	{
+		if (x > this.sprite.x)
 		{
-			return this.sprite.x;
+			this.sprite.x = x;
+			this.sprite.y = y;
 		}
 	}
 	
-	public float getY()
+	protected synchronized void updateJump(boolean jump)
 	{
-		synchronized (this.lock)
-		{
-			return this.sprite.y;
-		}
+		this.jump = jump;
 	}
 	
-	protected void updatePosition(float x, float y)
-	{
-		synchronized (this.lock)
-		{
-			if (x > this.sprite.x)
-			{
-				this.sprite.x = x;
-				this.sprite.y = y;
-			}
-		}
-	}
-	
-	protected boolean collide()
+	protected synchronized boolean collide()
 	{
 		return (this.level.collide(this.sprite));
 	}
@@ -134,14 +134,11 @@ public class Box
 		return result;
 	}
 	
-	public void render(Renderer renderer)
+	public synchronized void render(Renderer renderer)
 	{
-		synchronized (this.lock)
+		if (this.camera.isInside(this.sprite))
 		{
-			if (this.camera.isInside(this.sprite))
-			{
-				this.sprite.render(renderer);
-			}
+			this.sprite.render(renderer);
 		}
 	}
 }

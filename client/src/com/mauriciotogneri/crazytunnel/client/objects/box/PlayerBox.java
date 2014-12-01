@@ -22,11 +22,7 @@ public class PlayerBox extends Box
 	{
 		if (!finished())
 		{
-			if (input.jump)
-			{
-				jump();
-			}
-			
+			updateJump(input.jump);
 			updatePosition(delta);
 			
 			if (collide())
@@ -46,7 +42,7 @@ public class PlayerBox extends Box
 	}
 	
 	@Override
-	public void restart()
+	public synchronized void restart()
 	{
 		super.restart();
 		
