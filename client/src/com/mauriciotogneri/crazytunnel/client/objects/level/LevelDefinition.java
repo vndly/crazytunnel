@@ -27,9 +27,8 @@ public class LevelDefinition
 	private final List<Sprite> collisionableSprites = new ArrayList<Sprite>();
 	private final List<Sprite> nonCollisionableSprites = new ArrayList<Sprite>();
 	
-	public static final int WALL_COLOR = Color.argb(255, 90, 110, 120);
-	
 	private static final int WALL_HEIGHT = 4;
+	private static final int WALL_COLOR = Color.argb(255, 90, 110, 120);
 	
 	public LevelDefinition(Context context, int mapId, int laps)
 	{
