@@ -38,7 +38,7 @@ public class Game implements ClientConnectionEvent, DatagramCommunicationEvent
 	
 	private final Camera camera;
 	
-	private double totalTime = 0;
+	private double startTime = 0;
 	private final PlayerBox playerBox;
 	private final SparseArray<EnemyBox> enemyBoxes = new SparseArray<EnemyBox>();
 	
@@ -72,7 +72,7 @@ public class Game implements ClientConnectionEvent, DatagramCommunicationEvent
 		this.camera = new Camera(Renderer.RESOLUTION_X, Renderer.RESOLUTION_Y);
 		
 		Vibrator vibrator = gameScreen.getVibrator();
-		LevelDefinition levelDefinition = getLevelDefinition(gameScreen.getContext(), R.raw.map_short, laps);
+		LevelDefinition levelDefinition = getLevelDefinition(gameScreen.getContext(), R.raw.map4, laps);
 		
 		this.level = new Level(this.camera, levelDefinition);
 		
@@ -125,7 +125,6 @@ public class Game implements ClientConnectionEvent, DatagramCommunicationEvent
 	
 	private void processRunning(double delta, InputEvent input)
 	{
-		this.totalTime += delta;
 		this.playerBox.update(delta, input);
 		
 		broadcastBoxPosition(this.player, this.playerBox, input);
@@ -143,8 +142,8 @@ public class Game implements ClientConnectionEvent, DatagramCommunicationEvent
 			
 			this.gameScreen.displayRanking();
 			
-			ConnectionUtils.send(this.clientConnection, Messages.PlayerFinished.create(this.player.name, this.player.color, this.totalTime));
-			this.totalTime = 0;
+			double totalTime = (System.nanoTime() - this.startTime) / 1E9d;
+			ConnectionUtils.send(this.clientConnection, Messages.PlayerFinished.create(this.player.name, this.player.color, totalTime));
 		}
 	}
 	
@@ -187,6 +186,8 @@ public class Game implements ClientConnectionEvent, DatagramCommunicationEvent
 	private void startRace()
 	{
 		this.gameStatus = GameStatus.RUNNING;
+		
+		this.startTime = System.nanoTime();
 	}
 	
 	private void broadcastBoxPosition(Player player, PlayerBox box, InputEvent input)
