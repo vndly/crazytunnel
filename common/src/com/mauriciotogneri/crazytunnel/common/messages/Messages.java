@@ -34,7 +34,7 @@ public class Messages
 	
 	public static class PlayerInfo
 	{
-		public final byte id;
+		public final int playerId;
 		public final String name;
 		public final int color;
 		public final int udpPort;
@@ -43,17 +43,17 @@ public class Messages
 		
 		public PlayerInfo(MessageReader reader)
 		{
-			this.id = reader.getByte();
+			this.playerId = reader.getInt();
 			this.name = reader.getString();
 			this.color = reader.getInt();
 			this.udpPort = reader.getInt();
 		}
 		
-		public static byte[] create(byte id, String name, int color, int udpPort)
+		public static byte[] create(int playerId, String name, int color, int udpPort)
 		{
 			MessageWriter writer = new MessageWriter();
 			writer.putByte(PlayerInfo.CODE);
-			writer.putByte(id);
+			writer.putInt(playerId);
 			writer.putString(name);
 			writer.putInt(color);
 			writer.putInt(udpPort);
@@ -74,11 +74,11 @@ public class Messages
 			
 			for (int i = 0; i < this.players.length; i++)
 			{
-				byte id = reader.getByte();
+				int playerId = reader.getInt();
 				String name = reader.getString();
 				int color = reader.getInt();
 				
-				this.players[i] = new Player(id, name, color);
+				this.players[i] = new Player(playerId, name, color);
 			}
 		}
 		
@@ -90,7 +90,7 @@ public class Messages
 			
 			for (Player player : players)
 			{
-				writer.putByte(player.id);
+				writer.putInt(player.id);
 				writer.putString(player.name);
 				writer.putInt(player.color);
 			}
@@ -115,11 +115,11 @@ public class Messages
 			
 			for (int i = 0; i < length; i++)
 			{
-				byte id = reader.getByte();
+				int playerId = reader.getInt();
 				String name = reader.getString();
 				int color = reader.getInt();
 				
-				this.players.add(new Player(id, name, color));
+				this.players.add(new Player(playerId, name, color));
 			}
 		}
 		
@@ -132,7 +132,7 @@ public class Messages
 			
 			for (Player player : players)
 			{
-				writer.putByte(player.id);
+				writer.putInt(player.id);
 				writer.putString(player.name);
 				writer.putInt(player.color);
 			}
@@ -194,7 +194,7 @@ public class Messages
 	
 	public static class PlayerBoxPosition
 	{
-		public final byte playerId;
+		public final int playerId;
 		public final boolean jumping;
 		public final float x;
 		public final float y;
@@ -203,7 +203,7 @@ public class Messages
 		
 		public PlayerBoxPosition(MessageReader reader)
 		{
-			this.playerId = reader.getByte();
+			this.playerId = reader.getInt();
 			this.jumping = reader.getBoolean();
 			this.x = reader.getFloat();
 			this.y = reader.getFloat();
@@ -213,7 +213,7 @@ public class Messages
 		{
 			MessageWriter writer = new MessageWriter();
 			writer.putByte(PlayerBoxPosition.CODE);
-			writer.putByte(this.playerId);
+			writer.putInt(this.playerId);
 			writer.putBoolean(this.jumping);
 			writer.putFloat(this.x);
 			writer.putFloat(this.y);
@@ -221,11 +221,11 @@ public class Messages
 			return writer.getMessage();
 		}
 		
-		public static byte[] create(byte playerId, float x, float y, boolean jumping)
+		public static byte[] create(int playerId, float x, float y, boolean jumping)
 		{
 			MessageWriter writer = new MessageWriter();
 			writer.putByte(PlayerBoxPosition.CODE);
-			writer.putByte(playerId);
+			writer.putInt(playerId);
 			writer.putBoolean(jumping);
 			writer.putFloat(x);
 			writer.putFloat(y);
