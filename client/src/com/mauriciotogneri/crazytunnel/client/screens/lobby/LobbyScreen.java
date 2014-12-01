@@ -65,7 +65,7 @@ public class LobbyScreen extends BaseFragment implements ClientConnectionEvent, 
 	
 	private void processPlayerInfo(PlayerInfo playerInfo)
 	{
-		this.player = new Player(playerInfo.id, playerInfo.name, playerInfo.color);
+		this.player = new Player(playerInfo.playerId, playerInfo.name, playerInfo.color);
 		this.udpPort = playerInfo.udpPort;
 	}
 	

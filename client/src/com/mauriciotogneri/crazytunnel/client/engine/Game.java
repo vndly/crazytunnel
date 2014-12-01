@@ -72,7 +72,7 @@ public class Game implements ClientConnectionEvent, DatagramCommunicationEvent
 		this.camera = new Camera(Renderer.RESOLUTION_X, Renderer.RESOLUTION_Y);
 		
 		Vibrator vibrator = gameScreen.getVibrator();
-		LevelDefinition levelDefinition = getLevelDefinition(gameScreen.getContext(), R.raw.map4, laps);
+		LevelDefinition levelDefinition = getLevelDefinition(gameScreen.getContext(), R.raw.map_short, laps);
 		
 		this.level = new Level(this.camera, levelDefinition);
 		
@@ -127,14 +127,19 @@ public class Game implements ClientConnectionEvent, DatagramCommunicationEvent
 	{
 		this.playerBox.update(delta, input);
 		
-		broadcastBoxPosition(this.player, this.playerBox, input);
+		boolean finished = this.playerBox.finished();
+		
+		if (!finished)
+		{
+			broadcastBoxPosition(this.player, this.playerBox, input);
+		}
 		
 		for (int i = 0, size = this.enemyBoxes.size(); i < size; i++)
 		{
 			this.enemyBoxes.valueAt(i).update(delta);
 		}
 		
-		if (this.playerBox.finished())
+		if (finished)
 		{
 			this.playerBox.pause();
 			
@@ -192,24 +197,13 @@ public class Game implements ClientConnectionEvent, DatagramCommunicationEvent
 	
 	private void broadcastBoxPosition(Player player, PlayerBox box, InputEvent input)
 	{
-		// if (this.lastInput != input.jump)
-		// {
-		// this.lastInput = input.jump;
-		
 		ConnectionUtils.send(this.connection, this.udpAddress, this.udpPort, Messages.PlayerBoxPosition.create(player.id, box.getX(), box.getY(), input.jump));
 		
 		// ConnectionUtils.send(this.clientConnection, message);
-		// }
 	}
-	
-	// private long lastTime = (System.nanoTime() / 1000000);
 	
 	private void updateBoxPosition(PlayerBoxPosition playerBoxPosition)
 	{
-		// long now = (System.nanoTime() / 1000000);
-		// System.out.println("TEST " + (now - this.lastTime) + " = " + playerBoxPosition.x);
-		// this.lastTime = now;
-		
 		EnemyBox box = this.enemyBoxes.get(playerBoxPosition.playerId);
 		
 		if (box != null)

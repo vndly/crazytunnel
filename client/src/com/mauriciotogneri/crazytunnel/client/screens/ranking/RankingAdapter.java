@@ -44,15 +44,18 @@ public class RankingAdapter extends ArrayAdapter<RankingRow>
 		name.setText(rankingRow.playerName);
 		name.setTextColor(rankingRow.playerColor);
 		
-		TextView time = (TextView)convertView.findViewById(R.id.time);
+		TextView totalTime = (TextView)convertView.findViewById(R.id.total_time);
+		totalTime.setText(formatTime(rankingRow.time));
+		
+		TextView timeDifference = (TextView)convertView.findViewById(R.id.time_difference);
 		
 		if (rankingRow.timeDifference == 0)
 		{
-			time.setText("");
+			timeDifference.setText("");
 		}
 		else
 		{
-			time.setText(formatTime(rankingRow.timeDifference));
+			timeDifference.setText("+" + format(rankingRow.timeDifference, "#0.000"));
 		}
 		
 		return convertView;
@@ -68,7 +71,7 @@ public class RankingAdapter extends ArrayAdapter<RankingRow>
 		int seconds = (int)Math.floor(restTime);
 		restTime -= seconds;
 		
-		return "+" + format(minutes, "00") + ":" + format(seconds, "00") + ":" + format(restTime * 1000, "000");
+		return format(minutes, "00") + ":" + format(seconds, "00") + ":" + format(restTime * 1000, "000");
 	}
 	
 	private String format(double value, String format)
