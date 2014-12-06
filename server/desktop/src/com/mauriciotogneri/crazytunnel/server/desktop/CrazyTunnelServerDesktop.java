@@ -65,15 +65,15 @@ public class CrazyTunnelServerDesktop implements GameEvent
 	}
 	
 	@Override
-	public void onClientConnected(InetAddress address)
+	public void onPlayerConnected(InetAddress address, String name)
 	{
-		System.out.println("NEW CONNECTION: " + address.getHostAddress());
+		System.out.println("PLAYER CONNECTED: " + name + " (" + address.getHostAddress() + ")");
 	}
 	
 	@Override
-	public void onClientDisconnect(InetAddress address)
+	public void onPlayerDisconnect(String name)
 	{
-		System.out.println("CLIENT DISCONNECTED: " + address.getHostAddress());
+		System.out.println("PLAYER DISCONNECTED: " + name);
 	}
 	
 	@Override
@@ -86,5 +86,29 @@ public class CrazyTunnelServerDesktop implements GameEvent
 	public void onFinished()
 	{
 		System.err.println("SERVER CLOSED");
+	}
+	
+	@Override
+	public void onStartGame()
+	{
+		System.err.println("GAME STARTED");
+	}
+	
+	@Override
+	public void onStartRace()
+	{
+		System.err.println("RACE STARTED");
+	}
+	
+	@Override
+	public void onPlayerFinished(String name)
+	{
+		System.err.println("PLAYER FINISHED: " + name);
+	}
+	
+	@Override
+	public void onPlayerReady(String name)
+	{
+		System.err.println("PLAYER READY: " + name);
 	}
 }

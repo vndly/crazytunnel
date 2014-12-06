@@ -8,6 +8,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.channels.FileChannel;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import com.mauriciotogneri.crazytunnel.server.core.Game;
 import com.mauriciotogneri.crazytunnel.server.core.Game.GameEvent;
 
@@ -44,18 +47,43 @@ public class CrazyTunnelServerWeb implements GameEvent
 	public void onConnected(InetAddress address, int port)
 	{
 		writeFile("SERVER STARTED: " + address + ":" + port);
+		writeFile("PLAYERS: " + this.players + " - LAPS: " + this.laps);
 	}
 	
 	@Override
-	public void onClientConnected(InetAddress address)
+	public void onPlayerConnected(InetAddress address, String name)
 	{
-		writeFile("NEW CONNECTION: " + address.getHostAddress());
+		writeFile("PLAYER CONNECTED: " + name + " (" + address.getHostAddress() + ")");
 	}
 	
 	@Override
-	public void onClientDisconnect(InetAddress address)
+	public void onPlayerDisconnect(String name)
 	{
-		writeFile("CLIENT DISCONNECTED: " + address.getHostAddress());
+		writeFile("PLAYER DISCONNECTED: " + name);
+	}
+	
+	@Override
+	public void onStartGame()
+	{
+		writeFile("GAME STARTED");
+	}
+	
+	@Override
+	public void onStartRace()
+	{
+		writeFile("RACE STARTED");
+	}
+	
+	@Override
+	public void onPlayerFinished(String name)
+	{
+		writeFile("PLAYER FINISHED: " + name);
+	}
+	
+	@Override
+	public void onPlayerReady(String name)
+	{
+		writeFile("PLAYER READY: " + name);
 	}
 	
 	@Override
@@ -114,13 +142,30 @@ public class CrazyTunnelServerWeb implements GameEvent
 		{
 			System.out.println(content);
 			
-			this.eventFile.append(content + "\r\n");
+			this.eventFile.append(getDate() + "   " + content + "\r\n");
 			this.eventFile.flush();
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	private String getDate()
+	{
+		String result = "";
+		
+		try
+		{
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault());
+			result = formatter.format(new Date());
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		return result;
 	}
 	
 	private void close(Closeable resource)
