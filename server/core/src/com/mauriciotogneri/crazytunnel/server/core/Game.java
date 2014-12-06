@@ -70,8 +70,6 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 	@Override
 	public void onClientConnected(Socket socket)
 	{
-		this.gameEvent.onClientConnected(socket.getInetAddress());
-		
 		Client client = new Client(this, socket);
 		client.start();
 	}
@@ -100,7 +98,7 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 	
 	public void clientDisconnect(Client client)
 	{
-		this.gameEvent.onClientDisconnect(client.getRemoteAddress());
+		this.gameEvent.onPlayerDisconnect(this.players.get(client).name);
 		
 		synchronized (this.players)
 		{
@@ -113,7 +111,7 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 		}
 	}
 	
-	public int getPlayerColor()
+	private int getPlayerColor()
 	{
 		int result = 0;
 		
@@ -139,6 +137,8 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 				result = new Player(id, playerConnect.name, color);
 				
 				this.players.put(client, result);
+				
+				this.gameEvent.onPlayerConnected(client.getRemoteAddress(), playerConnect.name);
 			}
 		}
 		
@@ -165,8 +165,10 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 		}
 	}
 	
-	public void processReady()
+	public void processReady(Client client)
 	{
+		this.gameEvent.onPlayerReady(this.players.get(client).name);
+		
 		if (this.playersReady.incrementAndGet() == this.numberOfPlayers)
 		{
 			try
@@ -216,6 +218,8 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 			}
 			
 			sendAllPlayers(Messages.RankingList.create(this.ranking));
+			
+			this.gameEvent.onPlayerFinished(playerFinished.playerName);
 		}
 	}
 	
@@ -247,6 +251,8 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 	
 	private void sendStartGame()
 	{
+		this.gameEvent.onStartGame();
+		
 		synchronized (this.players)
 		{
 			sendAllPlayers(Messages.StartGame.create(this.numberOfLaps, this.players.values()));
@@ -255,6 +261,8 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 	
 	private void sendStartRace()
 	{
+		this.gameEvent.onStartRace();
+		
 		sendAllPlayers(Messages.StartRace.create());
 	}
 	
@@ -315,8 +323,17 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 		
 		void onFinished();
 		
-		void onClientConnected(InetAddress address);
+		// ----------------------
+		void onPlayerConnected(InetAddress address, String name);
 		
-		void onClientDisconnect(InetAddress address);
+		void onPlayerDisconnect(String name);
+		
+		void onStartGame();
+		
+		void onStartRace();
+		
+		void onPlayerFinished(String name);
+		
+		void onPlayerReady(String name);
 	}
 }

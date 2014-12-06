@@ -61,7 +61,7 @@ public class Client implements ServerConnectionEvent
 				break;
 			
 			case Messages.Ready.CODE:
-				this.game.processReady();
+				this.game.processReady(this);
 				break;
 			
 			case Messages.PlayerFinished.CODE:
