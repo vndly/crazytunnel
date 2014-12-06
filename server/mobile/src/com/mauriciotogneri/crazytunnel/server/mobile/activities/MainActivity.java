@@ -157,15 +157,15 @@ public class MainActivity extends Activity implements GameEvent
 	}
 	
 	@Override
-	public void onClientConnected(InetAddress address)
+	public void onPlayerConnected(InetAddress address, String name)
 	{
-		addLog("NEW CONNECTION: " + address);
+		addLog("PLAYER CONNECTED: " + name + " (" + address.getHostAddress() + ")");
 	}
 	
 	@Override
-	public void onClientDisconnect(InetAddress address)
+	public void onPlayerDisconnect(String name)
 	{
-		addLog("CLIENT DISCONNECTED: " + address);
+		addLog("PLAYER DISCONNECTED: " + name);
 	}
 	
 	@Override
@@ -178,5 +178,29 @@ public class MainActivity extends Activity implements GameEvent
 	public void onFinished()
 	{
 		addLog("SERVER CLOSED");
+	}
+	
+	@Override
+	public void onStartGame()
+	{
+		addLog("GAME STARTED");
+	}
+	
+	@Override
+	public void onStartRace()
+	{
+		addLog("RACE STARTED");
+	}
+	
+	@Override
+	public void onPlayerFinished(String name)
+	{
+		addLog("PLAYER FINISHED: " + name);
+	}
+	
+	@Override
+	public void onPlayerReady(String name)
+	{
+		addLog("PLAYER READY: " + name);
 	}
 }
