@@ -37,6 +37,11 @@ public class Client implements ServerConnectionEvent
 		return this.serverConnection.getRemoteAddress();
 	}
 	
+	public void finish()
+	{
+		this.serverConnection.close();
+	}
+	
 	@Override
 	public void onDisconnect()
 	{
@@ -84,7 +89,7 @@ public class Client implements ServerConnectionEvent
 		}
 		else
 		{
-			// TODO: SEND ERROR CONNECTiNG
+			// TODO: SEND ERROR CONNECTING
 		}
 	}
 }

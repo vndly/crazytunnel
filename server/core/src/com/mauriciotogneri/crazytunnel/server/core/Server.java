@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Enumeration;
 
 public class Server extends Thread
@@ -26,13 +27,17 @@ public class Server extends Thread
 		{
 			this.serverSocket = new ServerSocket(this.port);
 			
-			this.serverEvent.onConnected(getAddress(), this.port);
+			this.serverEvent.onConnected(getAddress(), this.serverSocket.getLocalPort());
 			
 			while (this.running)
 			{
 				try
 				{
 					this.serverEvent.onClientConnected(this.serverSocket.accept());
+				}
+				catch (SocketException e)
+				{
+					
 				}
 				catch (Exception e)
 				{
@@ -98,9 +103,12 @@ public class Server extends Thread
 	
 	public void finish()
 	{
-		this.running = false;
-		closeServerSocket(this.serverSocket);
-		this.serverEvent.onFinished();
+		if (this.running)
+		{
+			this.running = false;
+			closeServerSocket(this.serverSocket);
+			this.serverEvent.onFinished();
+		}
 	}
 	
 	public interface ServerEvent

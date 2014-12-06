@@ -85,6 +85,16 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 	@Override
 	public void onFinished()
 	{
+		synchronized (this.players)
+		{
+			Set<Client> clients = this.players.keySet();
+			
+			for (Client client : clients)
+			{
+				client.finish();
+			}
+		}
+		
 		this.gameEvent.onFinished();
 	}
 	
@@ -95,6 +105,11 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 		synchronized (this.players)
 		{
 			this.players.remove(client);
+			
+			if (this.players.isEmpty())
+			{
+				this.server.finish();
+			}
 		}
 	}
 	
