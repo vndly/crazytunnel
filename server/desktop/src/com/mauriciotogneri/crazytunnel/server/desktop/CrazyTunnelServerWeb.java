@@ -120,8 +120,9 @@ public class CrazyTunnelServerWeb implements GameEvent
 				stream = new FileOutputStream(file);
 				channel = stream.getChannel();
 				channel.truncate(0);
-				result = new BufferedWriter(new FileWriter(file));
 			}
+			
+			result = new BufferedWriter(new FileWriter(file));
 		}
 		catch (Exception e)
 		{
