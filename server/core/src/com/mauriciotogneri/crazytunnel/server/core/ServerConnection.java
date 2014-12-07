@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Arrays;
 
 public class ServerConnection extends Thread
@@ -13,7 +14,7 @@ public class ServerConnection extends Thread
 	private InputStream reader;
 	private OutputStream writer;
 	private final Socket socket;
-	private boolean isConnected = true;
+	private volatile boolean isConnected = true;
 	
 	private static final int BUFFER_SIZE = 1024;
 	
@@ -85,21 +86,22 @@ public class ServerConnection extends Thread
 			}
 			
 		}
+		catch (SocketException e)
+		{
+		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
 		finally
 		{
-			disconnected();
+			if (this.isConnected)
+			{
+				this.serverEvent.onDisconnect();
+			}
+			
 			close();
 		}
-	}
-	
-	private void disconnected()
-	{
-		this.isConnected = false;
-		this.serverEvent.onDisconnect();
 	}
 	
 	private boolean close(Closeable resource)

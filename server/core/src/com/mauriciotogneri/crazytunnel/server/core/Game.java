@@ -83,17 +83,7 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 	@Override
 	public void onFinished()
 	{
-		synchronized (this.players)
-		{
-			Set<Client> clients = this.players.keySet();
-			
-			for (Client client : clients)
-			{
-				client.finish();
-			}
-		}
-		
-		this.gameEvent.onFinished();
+		finish();
 	}
 	
 	public void clientDisconnect(Client client)
@@ -106,9 +96,26 @@ public class Game implements ServerEvent, DatagramCommunicationEvent
 			
 			if (this.players.isEmpty())
 			{
-				this.server.finish();
+				finish();
 			}
 		}
+	}
+	
+	public void finish()
+	{
+		this.server.finish();
+		
+		synchronized (this.players)
+		{
+			Set<Client> clients = this.players.keySet();
+			
+			for (Client client : clients)
+			{
+				client.finish();
+			}
+		}
+		
+		this.gameEvent.onFinished();
 	}
 	
 	private int getPlayerColor()

@@ -37,7 +37,6 @@ public class Server extends Thread
 				}
 				catch (SocketException e)
 				{
-					
 				}
 				catch (Exception e)
 				{
@@ -51,7 +50,10 @@ public class Server extends Thread
 		}
 		finally
 		{
-			finish();
+			if (this.running)
+			{
+				this.serverEvent.onFinished();
+			}
 		}
 	}
 	
@@ -107,7 +109,6 @@ public class Server extends Thread
 		{
 			this.running = false;
 			closeServerSocket(this.serverSocket);
-			this.serverEvent.onFinished();
 		}
 	}
 	
